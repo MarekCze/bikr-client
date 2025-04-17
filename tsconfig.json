@@ -2,10 +2,13 @@
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
     "strict": true,
+    "baseUrl": ".", // Add baseUrl for path aliases
     "paths": {
       "@/*": [
         "./*"
-      ]
+      ],
+      "bikr-shared": ["../bikr-shared/src/index.ts"], // Add path to shared module index
+      "bikr-shared/*": ["../bikr-shared/src/*"] // Add path to other shared modules
     }
   },
   "include": [
