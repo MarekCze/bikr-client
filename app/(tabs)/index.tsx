@@ -4,6 +4,7 @@ import { HelloWave } from '@/components/HelloWave';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import GoogleAuthTest from '@/components/auth/GoogleAuthTest';
 
 export default function HomeScreen() {
   return (
@@ -50,6 +51,12 @@ export default function HomeScreen() {
           <ThemedText type="defaultSemiBold">app-example</ThemedText>.
         </ThemedText>
       </ThemedView>
+      
+      <ThemedView style={styles.authContainer}>
+        <ThemedText type="subtitle">Authentication Test</ThemedText>
+        <ThemedText>Test Google Sign-In functionality with Supabase integration.</ThemedText>
+        <GoogleAuthTest />
+      </ThemedView>
     </ParallaxScrollView>
   );
 }
@@ -70,5 +77,14 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     position: 'absolute',
+  },
+  authContainer: {
+    marginTop: 20,
+    padding: 16,
+    gap: 12,
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+    borderRadius: 8,
+    marginBottom: 20,
   },
 });
