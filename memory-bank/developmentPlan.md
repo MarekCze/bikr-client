@@ -22,15 +22,14 @@
   - React Navigation for routing
   - Feature-based folder structure
 
-- **Backend**:
-  - Supabase for authentication, database, storage
-  - Postgrest API for data access
-  - Realtime subscriptions for live features
-  - Edge Functions for custom business logic
-  - Storage buckets for media management
+- **Backend Interaction**:
+  - Client interacts with a backend API (likely Supabase-based) for authentication, data persistence, and storage.
+  - Utilizes API endpoints for data access.
+  - Leverages real-time features provided by the backend.
+  - Interacts with backend storage for media uploads/downloads.
 
-- **Design Patterns**:
-  - Repository pattern for data access
+- **Client-Side Design Patterns**:
+  - Repository pattern for abstracting data access (interacting with API client)
   - Command pattern for business operations
   - Observer pattern for event handling
   - Strategy pattern for varying behaviors
@@ -41,7 +40,7 @@
 ### 1.1 Project Setup & Environment Configuration
 - **Tasks**:
   1. Initialize Expo project with TypeScript
-     - Set up project structure
+     - Set up project structure (`bikr-client`)
      - Configure ESLint and Prettier
      - Set up Git repository and branching strategy
   
@@ -50,41 +49,39 @@
      - Set up dark/light mode support
      - Create shared component library structure
   
-  3. Supabase Integration
-     - Create Supabase project
-     - Set up database schema migrations
-     - Configure storage buckets
-     - Set up CI/CD pipeline
+  3. Backend Integration Setup
+     - Configure client environment variables for API endpoint and Supabase keys.
+     - Set up API client/service (`services/api.ts`, `services/supabase.ts`) to interact with backend.
 
 ### 1.2 Authentication Module
 - **Tasks**:
-  1. User Entity & Repository
-     - Define User domain model
-     - Create user repository interface
-     - Implement Supabase user repository
+  1. User Entity & Client Repository
+     - Utilize User domain model from `bikr-shared`.
+     - Create user repository interface (client-side).
+     - Implement client-side repository interacting with the auth API.
   
-  2. Authentication Service
-     - Implement email/password authentication
-     - Implement social login providers (Google, Apple, Facebook)
-     - Implement phone number authentication with OTP
-     - Create session management
+  2. Authentication Service Integration
+     - Integrate with backend email/password authentication endpoints.
+     - Integrate with backend social login provider endpoints (Google, Apple, Facebook).
+     - Integrate with backend phone number authentication endpoints.
+     - Implement client-side session management (e.g., using MMKV, context).
   
   3. Authentication UI Components
-     - Create login screen
-     - Create registration screen
-     - Create password reset flow
-     - Implement biometric authentication option
-     - Create authentication state provider component
+     - Create login screen (`app/auth/sign-in.tsx`)
+     - Create registration screen (`app/auth/sign-up.tsx`)
+     - Create password reset flow (`app/auth/reset-password.tsx`, `app/auth/new-password.tsx`)
+     - Implement biometric authentication option (client-side).
+     - Create authentication state provider/context (`hooks/useAuth.ts`).
 
 ### 1.3 User Profile & Onboarding
 - **Tasks**:
-  1. Profile Domain Model
-     - Define profile entity and value objects
-     - Create profile repository
-     - Implement profile service
+  1. Profile Domain Model & Client Repository
+     - Utilize profile entity from `bikr-shared`.
+     - Create client-side profile repository interface.
+     - Implement client-side repository interacting with profile API endpoints.
   
   2. User Onboarding Flow
-     - Create onboarding screens (interests, experience level, bikes)
+     - Create onboarding screens (interests, experience level, bikes).
      - Implement step progression management
      - Create permission request screens (location, notifications)
   
@@ -98,19 +95,19 @@
 
 ### 2.1 Content Domain
 - **Tasks**:
-  1. Content Models & Repositories
-     - Define post domain model (text, image, video variants)
-     - Create content repository interface
-     - Implement content storage service
+  1. Content Models & Client Repositories
+     - Utilize post domain model from `bikr-shared`.
+     - Create client-side content repository interface.
+     - Implement client-side repository interacting with content API endpoints (including media uploads).
   
-  2. Content Creation Service
-     - Implement text post creation
-     - Implement image upload and processing
-     - Implement video upload and processing
-     - Create content validation rules
+  2. Content Creation Flow
+     - Implement UI for text post creation.
+     - Implement UI for image selection and upload.
+     - Implement UI for video selection and upload.
+     - Utilize shared validation rules (`bikr-shared`).
   
-  3. Content State Management
-     - Define content state and actions
+  3. Content State Management (Client-Side)
+     - Define content state and actions (e.g., using Zustand or Redux Toolkit).
      - Implement optimistic updates
      - Create caching strategy
 
@@ -138,13 +135,13 @@
 
 ### 2.3 Feed System
 - **Tasks**:
-  1. Feed Data Management
-     - Create feed repository interface
-     - Implement different feed query strategies
-     - Create feed caching and pagination
+  1. Feed Data Management (Client-Side)
+     - Create client-side feed repository interface.
+     - Implement client-side logic to call different feed API endpoints.
+     - Implement client-side feed caching and pagination (`utils/feedCache.ts`).
   
   2. Feed UI Components
-     - Create base FeedPage component
+     - Create base FeedPage component (`components/feed/BaseFeedPage.tsx`)
      - Implement infinite scroll functionality
      - Create feed filter components
      - Implement pull-to-refresh
@@ -159,49 +156,49 @@
 
 ### 3.1 Comment System
 - **Tasks**:
-  1. Comment Domain
-     - Define comment entity model
-     - Create comment repository
-     - Implement comment service
+  1. Comment Domain & Client Repository
+     - Utilize comment entity model from `bikr-shared`.
+     - Create client-side comment repository interface.
+     - Implement client-side repository interacting with comment API endpoints.
   
   2. Comment Components
-     - Create comment input component
-     - Implement comment list component
-     - Create threaded replies UI
-     - Implement comment editing functionality
+     - Create comment input component (`components/content/Comment/CommentInput.tsx`)
+     - Implement comment list component (`components/content/Comment/CommentList.tsx`)
+     - Create threaded replies UI.
+     - Implement comment editing functionality (UI and API call).
   
-  3. Comment Interactions
-     - Implement comment like/dislike system
-     - Create mentions functionality
-     - Implement comment notifications
-     - Create comment moderation tools
+  3. Comment Interactions (Client-Side)
+     - Implement UI for comment like/dislike (calling API).
+     - Create mentions functionality (UI suggestion and formatting).
+     - Handle comment notifications received from backend.
+     - Integrate with moderation tools if exposed via API.
 
 ### 3.2 Following & Connections
 - **Tasks**:
-  1. Social Graph Domain
-     - Define connection/following model
-     - Create social repository
-     - Implement follow/unfollow service
+  1. Social Graph Domain & Client Repository
+     - Utilize connection/following model from `bikr-shared`.
+     - Create client-side social repository interface.
+     - Implement client-side repository interacting with follow/unfollow API endpoints.
   
   2. User Discovery
-     - Create user search functionality
-     - Implement user recommendations
-     - Create "people you may know" system
+     - Create user search functionality (UI and API call).
+     - Implement user recommendations (displaying data from API).
+     - Create "people you may know" system (displaying data from API).
   
   3. Connection Management UI
-     - Create following/followers lists
+     - Create following/followers lists (UI and API calls).
      - Implement connection management screens
      - Create block/mute functionality
 
 ### 3.3 Content Sharing
 - **Tasks**:
-  1. Share Service
-     - Implement internal content sharing
-     - Create external sharing options
-     - Implement deep linking support
+  1. Share Service Integration
+     - Implement internal content sharing (UI linking).
+     - Integrate with native external sharing options.
+     - Implement deep linking support (client-side routing).
   
   2. Share UI Components
-     - Create share sheet component
+     - Create share sheet component (`components/content/EngagementRibbon/ShareButton.tsx` interaction).
      - Implement share preview
      - Create custom share messages
 
@@ -209,21 +206,21 @@
 
 ### 4.1 Club Domain
 - **Tasks**:
-  1. Club Model & Repository
-     - Define club entity and value objects
-     - Create club repository interface
-     - Implement club service layer
+  1. Club Model & Client Repository
+     - Utilize club entity from `bikr-shared`.
+     - Create client-side club repository interface.
+     - Implement client-side repository interacting with club API endpoints.
   
-  2. Club Membership Management
-     - Implement membership levels and permissions
-     - Create join/leave functionality
-     - Implement invitation system
-     - Create moderation tools
+  2. Club Membership Management (Client Interaction)
+     - Implement UI for different membership levels/permissions (display).
+     - Create UI for join/leave functionality (calling API).
+     - Implement UI for invitation system (displaying/accepting/rejecting).
+     - Integrate with moderation tools if exposed via API.
 
 ### 4.2 Club Page Features
 - **Tasks**:
   1. Club Profile Components
-     - Create club header component
+     - Create club header component.
      - Implement club details section
      - Create club settings screens
      - Implement location management
@@ -243,21 +240,21 @@
 
 ### 5.1 Event Domain
 - **Tasks**:
-  1. Event Models & Repository
-     - Define event entity and value objects
-     - Create event repository interface
-     - Implement event service layer
+  1. Event Models & Client Repository
+     - Utilize event entity from `bikr-shared`.
+     - Create client-side event repository interface.
+     - Implement client-side repository interacting with event API endpoints.
   
-  2. Event Type Implementations
-     - Create meet-up event type
-     - Implement group ride event type
-     - Create track day event type
-     - Implement workshop event type
+  2. Event Type Display
+     - Implement UI to display meet-up event type.
+     - Implement UI to display group ride event type.
+     - Implement UI to display track day event type.
+     - Implement UI to display workshop event type.
 
 ### 5.2 Event Page Features
 - **Tasks**:
   1. Event Profile Components
-     - Create event header component
+     - Create event header component.
      - Implement event details section
      - Create event settings screens
      - Implement schedule management
@@ -275,13 +272,13 @@
 
 ### 5.3 Route & Location Feature
 - **Tasks**:
-  1. Location Domain
-     - Define location models
-     - Create route repository
-     - Implement mapping service
+  1. Location Domain & Client Repository
+     - Utilize location models from `bikr-shared`.
+     - Create client-side route repository interface.
+     - Implement client-side repository interacting with mapping/route API endpoints.
   
-  2. Route Creation & Management
-     - Create route builder interface
+  2. Route Creation & Management (UI)
+     - Create route builder interface (UI).
      - Implement waypoint management
      - Create route sharing functionality
      - Implement route rating system
@@ -296,21 +293,21 @@
 
 ### 6.1 Messaging Domain
 - **Tasks**:
-  1. Message Models & Repository
-     - Define message entities
-     - Create conversation repository
-     - Implement messaging service
+  1. Message Models & Client Repository
+     - Utilize message entities from `bikr-shared`.
+     - Create client-side conversation repository interface.
+     - Implement client-side repository interacting with messaging API endpoints.
   
-  2. Real-time Communication
-     - Set up Supabase real-time channels
-     - Implement message delivery system
-     - Create read receipts functionality
-     - Implement typing indicators
+  2. Real-time Communication (Client-Side)
+     - Subscribe to backend real-time channels (e.g., Supabase).
+     - Handle incoming messages and update UI.
+     - Implement UI for read receipts (displaying and sending events).
+     - Implement UI for typing indicators (displaying and sending events).
 
 ### 6.2 Chat UI Components
 - **Tasks**:
   1. Conversation Components
-     - Create conversation list
+     - Create conversation list (UI).
      - Implement conversation detail view
      - Create message bubble components
      - Implement media message types
@@ -329,13 +326,13 @@
 
 ### 7.1 Marketplace Domain
 - **Tasks**:
-  1. Listing Models & Repository
-     - Define listing entities by category
-     - Create marketplace repository
-     - Implement listing service
+  1. Listing Models & Client Repository
+     - Utilize listing entities from `bikr-shared`.
+     - Create client-side marketplace repository interface.
+     - Implement client-side repository interacting with listing API endpoints.
   
-  2. Seller Account Management
-     - Create individual seller profiles
+  2. Seller Account Management (UI)
+     - Create UI for individual seller profiles.
      - Implement business account verification
      - Create seller rating system
      - Implement transaction history
@@ -362,14 +359,14 @@
 
 ### 7.3 Transaction System
 - **Tasks**:
-  1. Payment Integration
-     - Integrate payment processor
-     - Create secure payment flow
-     - Implement escrow service for high-value items
-     - Create transaction receipt system
+  1. Payment Integration (Client-Side)
+     - Integrate with payment processor SDK/UI components.
+     - Create secure payment flow UI.
+     - Integrate with escrow service API if available.
+     - Display transaction receipts received from backend.
   
-  2. Buyer-Seller Communication
-     - Implement in-app messaging for transactions
+  2. Buyer-Seller Communication (UI)
+     - Implement in-app messaging UI for transactions.
      - Create offer/counter-offer system
      - Implement dispute resolution workflow
 
@@ -377,14 +374,14 @@
 
 ### 8.1 Ride Companion Mode
 - **Tasks**:
-  1. Ride Tracking Service
-     - Implement GPS tracking functionality
-     - Create ride statistics collection
-     - Implement battery optimization
-     - Create offline mode support
+  1. Ride Tracking Service (Client-Side)
+     - Implement GPS tracking functionality using device APIs.
+     - Create ride statistics collection and display.
+     - Implement battery optimization techniques on the client.
+     - Create offline mode support for tracking.
   
-  2. Ride Safety Features
-     - Create auto-response system
+  2. Ride Safety Features (Client-Side)
+     - Create auto-response system triggered by client events.
      - Implement emergency contact alerts
      - Create voice command system
   
@@ -395,26 +392,26 @@
 
 ### 8.2 Maintenance Tracker
 - **Tasks**:
-  1. Maintenance Domain
-     - Define maintenance record models
-     - Create maintenance repository
-     - Implement service schedule system
+  1. Maintenance Domain & Client Repository
+     - Utilize maintenance record models from `bikr-shared`.
+     - Create client-side maintenance repository interface.
+     - Implement client-side repository interacting with maintenance API endpoints.
   
-  2. Bike Management
-     - Create garage interface
+  2. Bike Management (UI)
+     - Create garage interface (UI).
      - Implement bike profile management
      - Create service history tracking
      - Implement part replacement logs
 
 ### 8.3 Gamification System
 - **Tasks**:
-  1. Achievement Domain
-     - Define badge and achievement models
-     - Create achievement repository
-     - Implement achievement rules engine
+  1. Achievement Domain & Client Repository
+     - Utilize badge and achievement models from `bikr-shared`.
+     - Create client-side achievement repository interface.
+     - Implement client-side repository interacting with achievement API endpoints.
   
-  2. Gamification Components
-     - Create achievement showcase
+  2. Gamification Components (UI)
+     - Create achievement showcase (UI).
      - Implement leaderboards
      - Create challenge system
      - Implement reward distribution
@@ -423,33 +420,33 @@
 
 ### 9.1 Offline Functionality
 - **Tasks**:
-  1. Offline Data Strategy
-     - Implement local database caching
-     - Create sync conflict resolution
-     - Implement background sync service
+  1. Offline Data Strategy (Client-Side)
+     - Implement local database caching (e.g., using WatermelonDB, MMKV, AsyncStorage).
+     - Create sync conflict resolution logic on the client.
+     - Implement background sync service on the client.
   
   2. Offline UI Adaptation
-     - Create offline mode indicators
+     - Create offline mode indicators in the UI.
      - Implement graceful degradation of features
      - Create offline content access
 
 ### 9.2 Notification System
 - **Tasks**:
-  1. Notification Domain
-     - Define notification models
-     - Create notification repository
-     - Implement notification service
+  1. Notification Domain & Client Handling
+     - Utilize notification models from `bikr-shared`.
+     - Implement client-side handling of received notifications.
+     - Store and display notifications.
   
-  2. Push Notification Integration
-     - Set up push notification service
-     - Implement notification categories
-     - Create notification preferences
-     - Implement rich notifications
+  2. Push Notification Integration (Client-Side)
+     - Set up push notification service integration (e.g., Expo Notifications).
+     - Handle received push notifications.
+     - Create UI for notification preferences (sending settings to backend).
+     - Implement rich notification display on the client.
 
-### 9.3 Performance Optimization
+### 9.3 Performance Optimization (Client-Side)
 - **Tasks**:
   1. Media Optimization
-     - Implement progressive image loading
+     - Implement progressive image loading in UI components.
      - Create adaptive media quality
      - Implement background upload/download
   
@@ -463,18 +460,17 @@
 
 ### 10.1 Testing Strategy
 - **Tasks**:
-  1. Unit Testing
-     - Create test suite for domain models
-     - Implement service layer tests
-     - Create repository tests
+  1. Unit Testing (Client-Side)
+     - Create test suite for UI components.
+     - Implement tests for client-side logic (state management, utilities).
+     - Create tests for client-side repositories (mocking API calls).
   
-  2. Integration Testing
-     - Implement API integration tests
-     - Create component integration tests
-     - Implement end-to-end user flows
+  2. Integration Testing (Client-Side)
+     - Create component integration tests (testing component interactions).
+     - Implement end-to-end user flows using tools like Detox or Maestro.
   
-  3. Performance Testing
-     - Create load testing scenarios
+  3. Performance Testing (Client-Side)
+     - Implement performance benchmarks for UI rendering and interactions.
      - Implement performance benchmarks
      - Create UI responsiveness tests
 
@@ -492,13 +488,13 @@
 
 ### 10.3 Monitoring & Analytics
 - **Tasks**:
-  1. Analytics Implementation
-     - Set up analytics service
-     - Create custom event tracking
-     - Implement user journey analysis
+  1. Analytics Implementation (Client-Side)
+     - Set up analytics service integration (e.g., Firebase Analytics, Segment).
+     - Create custom event tracking within the client application.
+     - Implement user journey analysis based on client events.
   
-  2. Error Monitoring
-     - Set up crash reporting
-     - Create error logging
-     - Implement performance monitoring
-     - Create user feedback system
+  2. Error Monitoring (Client-Side)
+     - Set up crash reporting integration (e.g., Sentry, Bugsnag).
+     - Create client-side error logging.
+     - Implement client-side performance monitoring.
+     - Create user feedback system UI.

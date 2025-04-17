@@ -1,54 +1,53 @@
 # Authentication Flow
 
 ## Overview
-Supabase-based authentication system handling:
-- OAuth integration (Google, Microsoft, Apple, Facebook)
+Client-side authentication flow interacting with a Supabase backend, handling:
+- OAuth integration (Google initially, others planned)
 - Email/password signup/login
-- Session management
-- Password recovery
+- Client-side session management using MMKV
+- Password recovery UI flow
 
 ## Status
 **Implementation Progress**: 100% (for required providers)
-**Current Phase**: Google OAuth and Email/Password authentication complete. Additional providers (Microsoft, Apple, Facebook) are currently on hold.
+**Current Phase**: Google OAuth and Email/Password authentication flows are implemented in the client. Integration with additional providers (Microsoft, Apple, Facebook) is currently on hold.
 
-## Authentication Methods Status
-| Method | Backend Config | UI Implementation | Session Handling | Status |
-|--------|---------------|------------------|-----------------|--------|
-| Google OAuth | ✅ Complete | ✅ Complete | ✅ Complete | Production Ready |
-| Email/Password | ✅ Complete | ✅ Complete | ✅ Complete | Production Ready |
-| Microsoft OAuth | ❌ Not Started | ❌ Not Started | ❌ Not Started | On Hold |
-| Apple OAuth | ❌ Not Started | ❌ Not Started | ❌ Not Started | On Hold |
-| Facebook OAuth | ❌ Not Started | ❌ Not Started | ❌ Not Started | On Hold |
+## Authentication Methods Status (Client Integration)
+| Method | Client UI | Client Logic (useAuth) | Session Handling (MMKV) | Status | Notes |
+|--------|-----------|------------------------|-------------------------|--------|-------|
+| Google OAuth | ✅ Complete | ✅ Complete | ✅ Complete | Ready | Relies on Supabase backend config |
+| Email/Password | ✅ Complete | ✅ Complete | ✅ Complete | Ready | Relies on Supabase backend config |
+| Microsoft OAuth | ❌ Not Started | ❌ Not Started | ❌ Not Started | On Hold | Backend config also needed |
+| Apple OAuth | ❌ Not Started | ❌ Not Started | ❌ Not Started | On Hold | Backend config also needed |
+| Facebook OAuth | ❌ Not Started | ❌ Not Started | ❌ Not Started | On Hold | Backend config also needed |
 
-## Completed Tasks
-1. Core Authentication Service
-   - [x] Supabase client initialization
-   - [x] Google OAuth integration
-   - [x] Email/Password authentication
-   - [x] Password reset flow
+## Completed Client Tasks
+1. Core Authentication Logic (`hooks/useAuth.ts`)
+   - [x] Supabase client initialization (`services/supabase.ts`)
+   - [x] Google OAuth flow handling (calling Supabase)
+   - [x] Email/Password authentication flow handling (calling Supabase)
+   - [x] Password reset flow handling (calling Supabase)
    - [x] Session persistence with MMKV
 
-2. UI Components
-   - [x] Google authentication button
-   - [x] Email/Password sign in form
-   - [x] Email/Password sign up form
-   - [x] Password reset form
-   - [x] New password form
-   - [x] Sign out functionality
-   - [x] Error handling for all auth flows
-   - [x] Profile data display after authentication
-   - [x] Form validation with Zod
-   - [x] Password strength indicator
+2. UI Components (`components/auth/`)
+   - [x] Google authentication button (`GoogleAuthTest.tsx` - Example)
+   - [x] Email/Password sign in form (`SignInForm.tsx`)
+   - [x] Email/Password sign up form (`SignUpForm.tsx`)
+   - [x] Password reset form (`PasswordResetForm.tsx`)
+   - [x] New password form (`NewPasswordForm.tsx`)
+   - [x] Sign out functionality (integrated into profile/settings UI)
+   - [x] Error handling display for all auth flows
+   - [x] Form validation using Zod (`authSchemas.ts`)
+   - [x] Password strength indicator component
 
-3. Navigation
-   - [x] Auth routes in Expo Router
-   - [x] Navigation helper for auth flows
-   - [x] Protected route handling
+3. Navigation (`app/auth/`)
+   - [x] Auth screens defined using Expo Router
+   - [x] Navigation helper/context for auth flows (`AuthNavigationHelper.tsx`)
+   - [x] Protected route handling (likely in root `_layout.tsx` checking auth state)
 
-4. Security
-   - [x] Secure token handling
-   - [x] Session storage encryption (MMKV)
-   - [x] Password validation requirements
+4. Client-Side Security Considerations
+   - [x] Secure token handling via Supabase client library
+   - [x] Session storage using MMKV (offers encryption)
+   - [x] Enforcing password validation requirements in UI forms
 
 ## Google OAuth Flow
 ```mermaid

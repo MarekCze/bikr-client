@@ -60,9 +60,9 @@ journey
       List/Buy[List or Buy Item]
 ```
 
-## Technical Requirements Driving Product Experience
+## Technical Requirements Driving Product Experience (Client Perspective)
 - **Cross-Platform:** Expo & Tamagui ensure a consistent experience on iOS and Android.
-- **Real-time:** Supabase Realtime powers live chats, feed updates, and notifications.
-- **Performance:** Optimized data loading (FlashList) and media handling are crucial for a smooth feed experience.
-- **Offline:** Caching strategies are needed for viewing content and potentially tracking rides offline.
-- **Location:** PostGIS and mapping integrations are key for local feeds, event locations, and route features.
+- **Real-time:** Client needs to handle real-time updates from the backend for live chats, feed updates, and notifications.
+- **Performance:** Optimized data loading (e.g., using FlashList) and efficient media display are crucial for a smooth feed experience.
+- **Offline:** Client-side caching strategies are needed for viewing content and potentially tracking rides offline.
+- **Location:** Client requires location data from the backend and integrates with mapping libraries for local feeds, event locations, and route display/tracking features.

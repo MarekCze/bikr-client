@@ -1,9 +1,9 @@
 # Expanded Requirements Brief: bikR
-## Core Technology Stack
+## Core Technology Stack (Client Focus)
 
-Frontend: Expo & Tamagui for cross-platform UI development
-Backend: Supabase for authentication, database, storage, and real-time features
-Maps Integration: For routes, track locations, and meetup points
+Client: Expo & Tamagui for cross-platform UI development
+Backend Interaction: Client interacts with a backend API (likely Supabase-based) for authentication, data persistence, storage, and real-time updates.
+Maps Integration: Client integrates with mapping libraries/SDKs to display routes, track locations, and show meetup points using data from the backend.
 
 ## Enhanced Components
 ### MediaCard (Core Content Container)
@@ -204,12 +204,13 @@ Weather Alerts: Warnings for routes with bad conditions
 Ride Planning: Safety checklist before group rides
 
 ## Authentication & User Management
-### Authentication Options
+### Authentication Options (Client Integration)
 
-Social logins (Google, Apple, Facebook)
-Email + password
-Phone number + OTP (one-time password)
-Biometric options where available (FaceID, fingerprint)
+Client integrates with backend API for:
+- Social logins (Google, Apple, Facebook)
+- Email + password authentication
+- Phone number + OTP authentication
+Client implements UI for biometric options where available (FaceID, fingerprint), triggering backend authentication.
 
 ### User Onboarding
 
@@ -220,14 +221,15 @@ Location permissions setup
 Notification preferences
 Club and rider recommendations
 
-### User Roles & Permissions
+### User Roles & Permissions (Client Display)
 
-Regular users
-Business accounts (verified)
-Club administrators
-Event organizers
-Content moderators
-Premium members
+Client UI adapts based on user roles received from the backend:
+- Regular users
+- Business accounts (verified status display)
+- Club administrators (access to admin UI)
+- Event organizers (access to organizer UI)
+- Content moderators (access to moderation tools if exposed)
+- Premium members (access to premium features UI)
 
 ## New Feature Ideas
 ### Ride Companion Mode
@@ -273,32 +275,31 @@ Check-ins at motorcycle landmarks
 Community challenges and competitions
 Reward system for active contributors
 
-## Technical Considerations
+## Technical Considerations (Client-Side)
 ### Offline Functionality
 
-Cache feed content for offline viewing
-Queue posts/comments for upload when back online
-Offline maps for saved routes
-Sync data when connection restored
+Implement client-side caching for feed content, user data, etc.
+Queue user actions (posts, comments) locally for upload when connection is restored.
+Implement offline map caching/storage for saved routes.
+Manage data synchronization logic upon reconnection.
 
 ### Performance Optimization
 
-Lazy loading for media content
-Compressed image/video uploads
-Efficient data pagination
-Battery usage optimization during ride tracking
+Implement lazy loading for media content in lists and galleries.
+Optimize image/video display and potentially handle client-side compression before upload.
+Implement efficient data pagination in UI lists (e.g., FlashList).
+Optimize client-side code for battery usage, especially during ride tracking (GPS usage).
 
-### Privacy Controls
+### Privacy Controls (Client UI)
 
-Granular location sharing settings
-Content visibility options
-Profile information control
-Hide garage contents from public view option
+Implement UI for granular location sharing settings.
+Implement UI for content visibility options (e.g., public, followers only).
+Implement UI for managing profile information visibility.
+Implement UI toggle to hide garage contents from public view.
 
-### Monetization Potential
+### Monetization Potential (Client UI)
 
-Premium subscription tier with advanced features
-Promoted listings in marketplace
-Featured events and clubs
-In-app advertising from motorcycle brands
-Commission on marketplace transactions
+Implement UI variations for premium subscription features.
+Display promoted listings/events/clubs based on data from the backend.
+Integrate SDKs for in-app advertising if required.
+Handle UI flows related to marketplace commissions if necessary (e.g., displaying fees).

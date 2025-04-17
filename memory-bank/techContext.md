@@ -7,34 +7,62 @@
 - **Supabase JS**: 2.49.4 (+ Auth 2.69, Realtime 2.11)
 - **React Navigation**: 7.x (Native Stack + Bottom Tabs)
 - **Tamagui**: 1.125.33 UI system
-- **Fastify**: 4.26.0 (API server)
-- **Zod**: 3.24.2 (Validation)
+- **Zod**: 3.24.2 (Validation - via `bikr-shared`)
 
-## Critical Dependencies
+## Critical Dependencies (Client)
 ```mermaid
 graph TD
-    CORE[Core] --> EXPO(Expo Modules)
-    CORE --> NAV(React Navigation)
-    UI[UI] --> TAMAGUI(Tamagui)
-    UI --> FLASH_LIST(Shopify FlashList)
-    STATE[State] --> MMKV(React Native MMKV)
-    STATE --> HOOKFORM(React Hook Form)
-    API[API] --> SUPABASE(Supabase JS)
-    API --> FASTIFY(Fastify)
-    VALIDATION[Validation] --> ZOD(Zod)
-    VALIDATION --> SHARED(Shared Types)
+    subgraph "Core"
+        EXPO(Expo Modules)
+        NAV(React Navigation)
+    end
+    subgraph "UI"
+        TAMAGUI(Tamagui)
+        FLASH_LIST(Shopify FlashList)
+    end
+    subgraph "State & Forms"
+        MMKV(React Native MMKV)
+        HOOKFORM(React Hook Form)
+    end
+    subgraph "Backend Interaction"
+        SUPABASE(Supabase JS Client)
+        API_CLIENT(Custom API Client - api.ts)
+    end
+    subgraph "Shared Logic"
+        SHARED_TYPES(bikr-shared Types)
+        SHARED_VALIDATION(bikr-shared Zod Schemas)
+    end
+
+    CORE --> UI
+    CORE --> STATE
+    CORE --> API_CLIENT
+    STATE --> HOOKFORM
+    HOOKFORM --> SHARED_VALIDATION
+    API_CLIENT --> SUPABASE
+    API_CLIENT --> SHARED_TYPES
 ```
 
-## Project Structure
+## Project Structure (Relevant to Client)
 ```
-bikeapp/                   # Monorepo Root
-├── package.json           # Workspace configuration
-├── bikR/                  # Mobile App (Expo/React Native)
-├── api/                   # API Layer (Fastify)
-└── shared/                # Shared Code (Types + Validation)
+bikr/                      # Project Root
+├── bikr-client/           # Mobile App (This Project)
+│   ├── app/               # Expo Router screens
+│   ├── assets/
+│   ├── components/        # Reusable UI components
+│   ├── constants/
+│   ├── contexts/
+│   ├── hooks/
+│   ├── memory-bank/       # Documentation specific to client
+│   ├── services/          # API client (api.ts, supabase.ts)
+│   ├── utils/
+│   ├── app.json
+│   ├── package.json
+│   └── tsconfig.json
+├── bikr-server/           # API Layer (Separate Project)
+└── bikr-shared/           # Shared Code (Types + Validation)
 ```
 
-## Windows Development Environment
+## Windows Development Environment (Client Focus)
 ### Required Setup
 1. Android Studio 2022.3+ with:
    - Android SDK 33
@@ -50,31 +78,43 @@ bikeapp/                   # Monorepo Root
    Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
    ```
 
-### Expo CLI Commands
+### Client CLI Commands (Run from `bikr-client/`)
 ```bash
-# Start dev server
-expo start --windows
+# Install dependencies
+npm install
 
-# Android build
-npm run android -- --variant=debug
+# Start dev server
+npx expo start --clear
+
+# Run on Android
+npm run android
+
+# Run on iOS (macOS only)
+npm run ios
+
+# Run on Web
+npm run web
 
 # Type checking
-npx tsc --noEmit
+npm run typecheck
+
+# Linting
+npm run lint
+
+# Testing
+npm test
 ```
 
-## Key Integration Patterns
-- **Supabase**: Configured via ENV vars in `.env`
-- **TypeScript**: Strict mode enabled (tsconfig.json)
-- **Testing**: Jest + React Test Renderer
-- **Linting**: Expo default ESLint config
-- **API Layer**: Fastify with type-safe endpoints via shared types
-- **Monorepo**: npm workspaces for coordinated development
-- **Supabase Storage (Post Media)**:
-  - **Strategy**: Frontend uploads directly to Supabase Storage.
-  - **Bucket Name**: `posts-media`
-  - **Path Structure**: `{user_id}/{timestamp}_{filename}` (e.g., `uuid/1678886400000_image.jpg`)
-  - **RLS Policies**:
-    - Upload: Authenticated users insert into their own path (`auth.uid()`).
-    - Read: Public read access.
-    - Update/Delete: Restricted to file owner (`auth.uid()`).
-  - **API Interaction**: API receives storage object paths (`mediaIds`) from frontend, generates public URLs using `getPublicUrl()`, and stores URLs in the `media` database table.
+## Key Integration Patterns (Client)
+- **Supabase Client**: Configured via ENV vars in `bikr-client/.env` (`services/supabase.ts`). Used for Auth, Realtime, Storage uploads.
+- **API Client**: Custom client (`services/api.ts`) interacts with `bikr-server` endpoints using Fetch API.
+- **TypeScript**: Strict mode enabled (`bikr-client/tsconfig.json`). Uses types from `bikr-shared`.
+- **Testing**: Jest + React Test Renderer for component testing.
+- **Linting**: Expo default ESLint config.
+- **Shared Code**: Utilizes types and validation schemas from the `bikr-shared` package.
+- **Supabase Storage (Post Media - Client Role)**:
+  - **Strategy**: Client uploads directly to Supabase Storage using `services/supabase.ts`.
+  - **Bucket Name**: `posts-media` (Configured via ENV).
+  - **Path Structure**: Client generates path like `{user_id}/{timestamp}_{filename}` before upload.
+  - **RLS Policies**: Client relies on Supabase RLS policies configured for the bucket (Upload requires auth, Read is public).
+  - **API Interaction**: Client sends the generated storage object path(s) to the `bikr-server` API (e.g., during post creation/update). Client receives public URLs (generated by the server) for displaying media.

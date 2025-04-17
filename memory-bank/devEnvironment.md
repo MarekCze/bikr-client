@@ -1,6 +1,6 @@
-# Development Environment Setup (Windows)
+# Client Development Environment Setup (Windows)
 
-This document outlines the specific setup required for developing the bikR project on a Windows machine.
+This document outlines the specific setup required for developing the bikr-client Expo project on a Windows machine.
 
 ## Required Software Installations
 1.  **Android Studio**: Version 2022.3 or newer.
@@ -40,79 +40,52 @@ Set-ExecutionPolicy RemoteSigned -Scope LocalMachine
 Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
 
-## Project-Specific Commands (Run from `d:/Projects/bikeapp`)
+## Project-Specific Commands (Run from `d:/Projects/bike/new/bikr-client`)
 
-### General
+### Client (bikr-client)
 ```bash
-# Install all workspace dependencies
+# Install client dependencies
 npm install
 
-# Run TypeScript check across all workspaces
-npm run typecheck --workspaces --if-present
+# Run TypeScript check
+npm run typecheck
 
-# Run linting across all workspaces
-npm run lint --workspaces --if-present
-```
+# Run linting
+npm run lint
 
-### Frontend (bikR)
-```bash
-# Navigate to frontend directory (optional, commands can be run from root)
-cd bikR
-
-# Start the Expo development server
+# Start the Expo development server for the client
 # Use --clear to reset cache if needed
-expo start
+npx expo start --clear
 
-# Start specifically for Android emulator/device
+# Start client specifically for Android emulator/device
 npm run android
+# or
+npx expo run:android
 
-# Start specifically for iOS simulator/device (requires macOS or Expo EAS)
+# Start client specifically for iOS simulator/device (requires macOS or Expo EAS)
 npm run ios
+# or
+npx expo run:ios
 
-# Start specifically for web
+# Start client specifically for web
 npm run web
+# or
+npx expo start --web
 
-# Run frontend tests
+# Run client tests
 npm test
-```
-
-### API (api)
-```bash
-# Navigate to API directory (optional, commands can be run from root)
-cd api
-
-# Start the Fastify development server (with hot-reloading)
-npm run dev
-
-# Build the API for production
-npm run build
-
-# Start the production server
-npm start
-
-# Run API tests
-npm test
-```
-
-### Shared (shared)
-```bash
-# Navigate to shared directory (optional, commands can be run from root)
-cd shared
-
-# Build the shared package (if needed, usually just type checking)
-npm run build
 ```
 
 ## Local Testing Procedures
-1.  Ensure Supabase services (local or cloud) are running and accessible.
-2.  Verify `.env` files in `api/` and `bikR/` contain the correct Supabase URL and keys.
-3.  Start the API server: `npm run dev --workspace=api` (from the root directory).
-4.  Start the Frontend app: `npm run android` (or `ios`/`web`) `--workspace=bikR` (from the root directory).
-5.  Use an Android Emulator (created via Android Studio's AVD Manager) or a physical device connected via USB debugging.
+1.  Ensure the backend server (`bikr-server`) is running and accessible (check its README for setup).
+2.  Verify the `.env` file in `bikr-client/` contains the correct Supabase URL/keys and the API server URL.
+3.  Start the Client app: `npm run android` (or `ios`/`web`) from the `bikr-client` directory.
+4.  Use an Android Emulator (created via Android Studio's AVD Manager) or a physical device connected via USB debugging. For iOS, use a Simulator (macOS only) or a physical device.
 
-## Common Troubleshooting (Windows)
+## Common Troubleshooting (Windows - Client Focus)
 *   **Emulator Performance:** Ensure Intel HAXM is installed and enabled in BIOS/UEFI settings. Allocate sufficient RAM to the emulator instance.
-*   **Port Conflicts:** If the API (default: 3000) or Expo (default: 8081) ports are in use, check for other running processes or configure different ports.
-*   **Dependency Issues:** Run `npm install` in the root directory. If issues persist, try removing `node_modules` folders in all workspaces and the root `package-lock.json`, then run `npm install` again.
+*   **Port Conflicts:** If the Expo bundler port (default: 8081) or other required ports are in use, check for other running processes. Expo might automatically choose a different port.
+*   **Dependency Issues:** Run `npm install` within the `bikr-client` directory. If issues persist, try removing `bikr-client/node_modules` and `bikr-client/package-lock.json`, then run `npm install` again.
 *   **Environment Variables Not Recognized:** Restart PowerShell/CMD or the entire system after setting environment variables. Verify paths are correct using `echo %ANDROID_HOME%` or `Get-ChildItem Env:ANDROID_HOME`.
-*   **Expo CLI Errors:** Ensure Expo CLI is installed globally (`npm install -g expo-cli`) or use `npx expo ...`. Keep Expo CLI updated.
+*   **Expo CLI Errors:** Ensure Expo CLI is installed globally (`npm install -g expo-cli`) or use `npx expo ...` within the `bikr-client` directory. Keep Expo CLI updated (`npm install -g expo-cli@latest`). Check for compatibility issues between Expo SDK version and Expo CLI version.
+*   **Cannot Connect to Development Server:** Ensure the emulator/device is on the same network as the development machine. Check firewall settings. Try selecting "Tunnel" connection mode in the Expo Go app or terminal if network issues persist.

@@ -26,71 +26,109 @@ flowchart TD
    - Tamagui design tokens
    - Constants/Colors.ts definitions
 
-## Monorepo Structure
+## Project Structure
 ```mermaid
 graph TD
-    Root[bikeapp/] --> Frontend[bikR/]
-    Root --> API[api/]
-    Root --> Shared[shared/]
+    Root[bikr/] --> Client[bikr-client/]
+    Root --> Server[bikr-server/]
+    Root --> Shared[bikr-shared/]
     
-    Frontend --> FEComponents[components/]
-    Frontend --> FEApp[app/]
-    Frontend --> FEServices[services/]
+    Client --> ClientComponents[components/]
+    Client --> ClientApp[app/]
+    Client --> ClientServices[services/]
+    Client --> ClientHooks[hooks/]
     
-    API --> APIRoutes[routes/]
-    API --> APIPlugins[plugins/]
-    API --> APIConfig[config/]
+    Server --> ServerRoutes[src/routes/]
+    Server --> ServerServices[src/services/]
+    Server --> ServerPlugins[src/plugins/]
+    Server --> ServerRepositories[src/repositories/]
     
-    Shared --> STypes[types/]
-    Shared --> SValidation[validation/]
+    Shared --> SharedTypes[src/types/]
+    Shared --> SharedValidation[src/validation/]
+    Shared --> SharedRepositories[src/repositories/]
     
-    FEServices --> |uses| STypes
-    APIRoutes --> |uses| STypes
+    ClientServices --> |uses| SharedTypes
+    ClientServices --> |uses| SharedValidation
+    ServerServices --> |uses| SharedTypes
+    ServerServices --> |uses| SharedValidation
+    ServerRepositories --> |uses| SharedTypes
+    ServerRepositories --> |implements| SharedRepositories
 ```
 
-## API Layer Architecture
+## Client-Server Interaction Architecture
 ```mermaid
 graph TD
-    Frontend[Frontend] --> |HTTP Requests| API[API Layer]
-    API --> |Database Operations| Supabase[Supabase]
+    Client[bikr-client] --> |HTTP Requests via api.ts| ServerAPI[bikr-server API]
+    Client --> |Direct Auth/Realtime/Storage| Supabase[Supabase]
+    ServerAPI --> |Database Operations| Supabase
     
-    subgraph "Frontend"
-        FEServices[services/api.ts]
-        FEHooks[hooks/useAuth.ts]
-        FEComponents[components/]
+    subgraph "bikr-client"
+        ClientServices[services/api.ts]
+        ClientSupabase[services/supabase.ts]
+        ClientHooks[hooks/useAuth.ts]
+        ClientComponents[components/]
+        ClientApp[app/]
     end
     
-    subgraph "API Layer"
-        APIRoutes[routes/]
-        APIPlugins[plugins/]
-        APIValidation[Validation]
-        APIBusiness[Business Logic]
+    subgraph "bikr-server API"
+        ServerRoutes[src/routes/]
+        ServerServices[src/services/]
+        ServerValidation[Validation (uses bikr-shared)]
     end
     
     subgraph "Supabase"
         SubAuth[Authentication]
         SubDB[Database]
         SubRealtime[Realtime]
+        SubStorage[Storage]
     end
     
-    FEServices --> APIRoutes
-    APIRoutes --> APIBusiness
-    APIBusiness --> SubDB
-    FEHooks --> |Auth Requests| SubAuth
+    ClientServices --> ServerRoutes
+    ClientSupabase --> SubAuth
+    ClientSupabase --> SubRealtime
+    ClientSupabase --> SubStorage
+    ClientHooks --> ClientSupabase
+    ServerServices --> SubDB
 ```
 
-## API Integration Flow
+## Client Data Flow Example (Feed)
 ```mermaid
 sequenceDiagram
-    App->>API: API Request
-    API->>Supabase: Database Operation
-    Supabase-->>API: Response Data
-    API-->>App: Processed Response
-    
-    App->>Supabase: Direct Auth Request
-    Supabase-->>App: JWT Token
-    
-    App->>Supabase: Realtime Subscribe
-    Supabase->>App: Realtime Updates
-    
-    App->>MMKV: Cache Data
+    participant ClientApp as Client UI (Feed Screen)
+    participant ClientService as services/api.ts
+    participant ServerAPI as bikr-server API (/feed)
+    participant SupabaseDB as Supabase DB
+    participant MMKV as Client Cache (MMKV)
+
+    ClientApp->>ClientService: Request Feed Data (e.g., getPopularFeed)
+    ClientService->>ServerAPI: GET /feed/popular?cursor=...
+    ServerAPI->>SupabaseDB: Query popular posts
+    SupabaseDB-->>ServerAPI: Post Data
+    ServerAPI-->>ClientService: Processed Feed Response
+    ClientService->>MMKV: Cache Feed Data
+    ClientService-->>ClientApp: Return Feed Data
+    ClientApp->>ClientApp: Render Feed using FlashList
+```
+
+## Client Authentication Flow
+```mermaid
+sequenceDiagram
+    participant ClientUI as Auth Screen (SignInForm)
+    participant ClientHook as hooks/useAuth.ts
+    participant ClientSupabase as services/supabase.ts
+    participant SupabaseAuth as Supabase Auth Service
+    participant MMKV as Client Session Storage
+
+    ClientUI->>ClientHook: signInWithPassword(email, pass)
+    ClientHook->>ClientSupabase: supabase.auth.signInWithPassword(...)
+    ClientSupabase->>SupabaseAuth: Authenticate Request
+    SupabaseAuth-->>ClientSupabase: Auth Response (Session/Error)
+    ClientSupabase-->>ClientHook: Return Session/Error
+    alt Authentication Successful
+        ClientHook->>MMKV: Store Session Data
+        ClientHook->>ClientUI: Update Auth State (Authenticated)
+    else Authentication Failed
+        ClientHook->>ClientUI: Display Error Message
+    end
+
+```

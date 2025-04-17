@@ -14,125 +14,102 @@ Reference to Phase 2.3 in `developmentPlan.md`:
 ## Status
 In Progress
 
-## Technical Architecture
+## Technical Architecture (Client Focus)
 
 ### Data Flow
 ```mermaid
 flowchart TD
-    API[API Client] --> FeedRepo[Feed Repository]
-    FeedRepo --> FeedServ[Feed Service]
-    FeedServ --> FeedAPI[Feed API Endpoints]
-    FeedAPI --> UI[Feed UI Components]
-    UI --> User[User Interaction]
-    User --> Cache[Client Cache]
-    Cache --> API
+    UI[Feed UI Components] --> UserInteraction[User Interaction (Scroll, Refresh, Filter)]
+    UserInteraction --> FeedContext[Feed Context/Hook]
+    FeedContext --> APIClient[API Client (services/api.ts)]
+    APIClient --> ServerAPI[Server API (/feed/*)]
+    ServerAPI --> APIClient
+    APIClient --> Cache[Client Cache (MMKV/utils/feedCache.ts)]
+    Cache --> FeedContext
+    APIClient --> FeedContext
+    FeedContext --> UI
 ```
 
 ### Component Hierarchy
 ```mermaid
 flowchart TD
-    BaseFeed[BaseFeedPage Component] --> InfiniteScroll[Infinite Scroll Logic]
-    BaseFeed --> PTR[Pull-to-Refresh]
-    BaseFeed --> FeedFilter[Feed Filter Components]
-    BaseFeed --> UserFeed[UserFeedPage]
-    BaseFeed --> PopularFeed[PopularFeedPage]
-    BaseFeed --> LocalFeed[LocalFeedPage]
-    BaseFeed --> FilteredFeeds[Filtered Feed Pages]
+    BaseFeed[BaseFeedPage Component (`components/feed/BaseFeedPage.tsx`)] --> InfiniteScroll[Infinite Scroll Logic (FlashList)]
+    BaseFeed --> PTR[Pull-to-Refresh Logic]
+    BaseFeed --> FeedFilter[Feed Filter Components UI]
+    BaseFeed --> UserFeed[UserFeedPage (`components/feed/UserFeedPage.tsx`)]
+    BaseFeed --> PopularFeed[PopularFeedPage (`components/feed/PopularFeedPage.tsx`)]
+    BaseFeed --> LocalFeed[LocalFeedPage (`components/feed/LocalFeedPage.tsx`)]
+    BaseFeed --> FilteredFeeds[Filtered Feed Pages (`components/feed/FilteredFeedPage.tsx`)]
 ```
 
-## Tasks
+## Tasks (Client Focus)
 
-1. Feed Data Management Layer
-   - [x] Define feed repository interface
-     - [x] Create FeedQueryOptions interface
-     - [x] Create FeedResult interface
-     - [x] Define method signatures for different feed types
-   - [x] Implement Supabase feed repository
-     - [x] Create getUserFeed method
-     - [x] Create getPopularFeed method
-     - [x] Create getLocalFeed method (with PostGIS integration)
-     - [x] Create getFilteredFeed method (for club/event feeds)
-     - [x] Debug and fix property name mismatch in cursor generation (`created_at` → `createdAt`)
-     - [ ] Create missing database function: `get_popular_feed`
-   - [ ] Create feed service layer
-     - [ ] Implement business logic for feed item filtering
-     - [ ] Add content transformation methods
-   - [ ] Implement feed API endpoints
-     - [ ] Create GET /feeds/user endpoint
-     - [ ] Create GET /feeds/popular endpoint
-     - [ ] Create GET /feeds/local endpoint
-     - [ ] Create GET /feeds/filtered endpoint
-   - [ ] Design and implement caching strategy
-     - [ ] Client-side caching with MMKV
-     - [ ] API-level caching strategy
-     - [ ] Cache invalidation logic
+1. Feed Data Management Layer (Client)
+   - [x] Utilize feed repository interface from `bikr-shared` (`shared/src/repositories/feedRepository.ts`)
+   - [x] Implement client-side feed fetching logic in API client (`services/api.ts`)
+     - [x] Call `GET /feeds/user` endpoint
+     - [x] Call `GET /feeds/popular` endpoint
+     - [x] Call `GET /feeds/local` endpoint (passing client location)
+     - [x] Call `GET /feeds/filtered` endpoint (for club/event feeds)
+     - [x] Handle API responses and errors
+   - [x] Design and implement client-side caching strategy
+     - [x] Client-side caching with MMKV (`utils/feedCache.ts`)
+     - [x] Implement cache invalidation logic (e.g., on refresh, post creation)
 
-2. Feed UI Components
-   - [ ] Create BaseFeedPage component
-     - [ ] Implement state management for feed data
-     - [ ] Add loading and error states
-     - [ ] Build UI layout structure
-   - [ ] Implement infinite scroll functionality
-     - [ ] Integrate with FlashList for optimal performance
-     - [ ] Handle cursor-based pagination
-     - [ ] Add scroll position restoration
+2. Feed UI Components (`components/feed/`)
+   - [x] Create BaseFeedPage component
+     - [x] Implement state management for feed data (posts, cursor, loading, error)
+     - [x] Add loading and error state UI
+     - [x] Build UI layout structure using Tamagui
+   - [x] Implement infinite scroll functionality
+     - [x] Integrate with FlashList for optimal performance
+     - [x] Handle cursor-based pagination logic (fetching more data)
+     - [ ] Add scroll position restoration (optional enhancement)
    - [ ] Create feed filter components
      - [ ] Design filter bar UI
      - [ ] Implement filter state management
-     - [ ] Add filter persistence
-   - [ ] Add pull-to-refresh functionality
-     - [ ] Implement data refresh mechanism
-     - [ ] Add loading indicator
+     - [ ] Add filter persistence (optional enhancement)
+   - [x] Add pull-to-refresh functionality
+     - [x] Implement data refresh mechanism (calling fetchFeed with no cursor)
+     - [x] Add loading indicator (using FlashList `refreshing` prop)
 
-3. Feed Type Implementations
-   - [ ] Create Feed Context provider
-     - [ ] Implement feed state management
-     - [ ] Add caching functionality
-     - [ ] Create refresh methods
-   - [ ] Implement UserFeed page
-     - [ ] Create user-specific feed UI
-     - [ ] Add followed content logic
-   - [ ] Implement PopularFeed page
-     - [ ] Add trending content algorithm integration
-     - [ ] Create time-sensitive popular content display
-   - [ ] Implement LocalFeed page
-     - [ ] Add location-based filtering
-     - [ ] Create distance indicator component
-   - [ ] Implement filtered feed pages
-     - [ ] Create ClubFeed page
-     - [ ] Create EventFeed page
-     - [ ] Add SkillLevelFeed page
-     - [ ] Create BikeTypeFeed page
+3. Feed Type Implementations (`app/(tabs)/`, `components/feed/`)
+   - [x] Create Feed Context provider (`contexts/FeedContext.tsx`)
+     - [x] Implement feed state management (using React Context/hooks)
+     - [x] Integrate caching functionality
+     - [x] Create refresh methods
+   - [x] Implement UserFeed page (`components/feed/UserFeedPage.tsx`, integrated in `app/(tabs)/index.tsx`?)
+     - [x] Integrate with `BaseFeedPage`, passing user feed fetch logic
+   - [x] Implement PopularFeed page (`components/feed/PopularFeedPage.tsx`, integrated in `app/(tabs)/explore.tsx`?)
+     - [x] Integrate with `BaseFeedPage`, passing popular feed fetch logic
+   - [x] Implement LocalFeed page (`components/feed/LocalFeedPage.tsx`)
+     - [x] Integrate with `BaseFeedPage`, passing local feed fetch logic
+     - [x] Add location permission handling and fetching
+   - [ ] Implement filtered feed pages (`components/feed/FilteredFeedPage.tsx`)
+     - [ ] Create ClubFeed page integration
+     - [ ] Create EventFeed page integration
+     - [ ] Add SkillLevelFeed page integration (if API supports)
+     - [ ] Create BikeTypeFeed page integration (if API supports)
 
-4. Testing
-   - [ ] Write repository unit tests
-   - [ ] Create service layer tests
-   - [ ] Implement UI component tests
-   - [ ] Add API endpoint tests
-   - [ ] Perform performance testing
+4. Testing (Client)
+   - [ ] Write unit tests for Feed Context/hooks (mocking API calls)
+   - [ ] Implement UI component tests for `BaseFeedPage` and specific feed pages
+   - [ ] Add integration tests for feed loading and interaction flows
+   - [ ] Perform performance testing on feed scrolling
 
-## Implementation Details
+## Implementation Details (Client Focus)
 
-### Feed Repository Interface
+### Shared Feed Interfaces (from `bikr-shared`)
 ```typescript
-// shared/src/repositories/feedRepository.ts
-export interface IFeedRepository {
-  getUserFeed(userId: string, options: FeedQueryOptions): Promise<FeedResult>;
-  getPopularFeed(options: FeedQueryOptions): Promise<FeedResult>;
-  getLocalFeed(location: GeoPoint, radius: number, options: FeedQueryOptions): Promise<FeedResult>;
-  getFilteredFeed(filterType: string, filterId: string, options: FeedQueryOptions): Promise<FeedResult>;
-}
-
+// shared/src/repositories/feedRepository.ts - Relevant parts for client
 export interface FeedQueryOptions {
   cursor?: string;
   limit?: number;
-  contentTypes?: string[];
-  dateRange?: DateRange;
-  // Additional filter options
+  // ... other potential client-side filters
 }
 
 export interface FeedResult {
-  posts: DetailedPost[];
+  posts: DetailedPost[]; // DetailedPost from shared/src/types/post.ts
   nextCursor?: string;
   hasMore: boolean;
 }
@@ -140,69 +117,69 @@ export interface FeedResult {
 
 ### BaseFeedPage Component Structure
 ```typescript
-// bikR/components/feed/BaseFeedPage.tsx
+// bikr-client/components/feed/BaseFeedPage.tsx
 export type FeedPageProps = {
-  fetchFeed: (options: FeedQueryOptions) => Promise<FeedResult>;
-  onRefresh?: () => Promise<void>;
-  filters?: FeedFilter[];
-  EmptyComponent?: React.FC;
-  HeaderComponent?: React.FC;
+  fetchFeedFunction: (options: FeedQueryOptions) => Promise<FeedResult>; // Function provided by specific feed page
+  feedKey: string; // Unique key for caching
+  // ... other props like HeaderComponent, EmptyComponent, filters
 };
 
-export function BaseFeedPage({ fetchFeed, onRefresh, filters, ...props }: FeedPageProps) {
-  // Implementation details
+export function BaseFeedPage({ fetchFeedFunction, feedKey, ...props }: FeedPageProps) {
+  // State for posts, loading, error, cursor
+  // Logic for initial fetch, fetchMore, refresh
+  // Uses FlashList for rendering MediaCard components
 }
 ```
 
 ### Feed Context Provider
 ```typescript
-// bikR/contexts/FeedContext.tsx
+// bikr-client/contexts/FeedContext.tsx
+// Provides shared state or functions if needed across different feed types,
+// potentially managing cache access or refresh triggers.
 export const FeedContext = createContext<FeedContextType | undefined>(undefined);
 
 export function FeedProvider({ children }: PropsWithChildren<{}>) {
-  // Implementation details
+  // State, cache access logic, refresh functions
 }
 
-export const useFeed = () => {
+export const useFeedContext = () => { // Renamed hook
   const context = useContext(FeedContext);
-  if (!context) throw new Error("useFeed must be used within a FeedProvider");
+  // ... error handling ...
   return context;
 };
 ```
 
-## Technical Considerations
+## Technical Considerations (Client-Side)
 
 1. **Pagination Strategy**:
-   - Using cursor-based pagination with post IDs and timestamps
-   - Page sizes should be adaptive based on device performance
+   - Client implements cursor-based pagination logic, requesting next page from API.
+   - Client manages `nextCursor` state.
 
 2. **Performance Optimization**:
-   - FlashList for virtualized list rendering
-   - Lazy loading and progressive image loading
-   - Smart caching to reduce network requests
+   - Client utilizes FlashList for virtualized list rendering.
+   - Client implements lazy loading and progressive image loading within `MediaCard`.
+   - Client implements smart caching (`utils/feedCache.ts`) to reduce network requests.
 
 3. **Offline Support**:
-   - MMKV storage for feed data caching
-   - Optimistic UI updates
-   - Clear loading/error states for network issues
+   - Client uses MMKV storage (`utils/feedCache.ts`) for feed data caching.
+   - Client UI shows cached data when offline.
+   - Client UI provides clear loading/error states for network issues.
 
 4. **Location Integration**:
-   - PostGIS for geospatial queries
-   - Privacy considerations for location sharing
-   - Battery optimization for location updates
+   - Client requests location permissions and fetches device location for local feed.
+   - Client passes location coordinates to the `/feeds/local` API endpoint.
+   - Client displays location-related info (e.g., distance) if provided by API.
 
-## Integration Points
+## Integration Points (Client)
 
-- **Authentication**: Feed queries need to include user authentication
-- **Content Components**: MediaCard is used to render feed items
-- **Navigation**: Feed items link to detail pages
-- **Storage**: Media content is loaded from Supabase Storage
-- **Supabase RLS**: Row Level Security ensures users see only the content they should
+- **Authentication**: Client API calls (`services/api.ts`) automatically include auth tokens.
+- **Content Components**: `MediaCard` component (`components/content/MediaCard/`) is used to render feed items.
+- **Navigation**: Feed items link to detail pages using Expo Router.
+- **Storage**: Media content URLs (fetched via API) are used by `MediaCard` to display images/videos.
 
-## Future Enhancements
+## Future Enhancements (Client Focus)
 
-- Advanced content recommendation algorithm
-- Machine learning for content categorization
-- Feed customization options
-- Content moderation queue for reported items
-- Analytics integration for content performance metrics
+- Implement advanced client-side filtering UI.
+- Add animations and smoother transitions.
+- Enhance offline experience with more robust caching.
+- Integrate analytics for feed interaction tracking.
