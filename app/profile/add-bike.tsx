@@ -1,19 +1,26 @@
-import React, { useState } from 'react';
-import { View, Text, Button, TextInput, Alert, ActivityIndicator, StyleSheet } from 'react-native'; // Or use Tamagui components
+import React, { useState, useMemo } from 'react';
+import { Alert, ScrollView } from 'react-native'; // Keep Alert, add ScrollView
 import { useRouter } from 'expo-router';
-import { ThemedView } from '@/components/ThemedView';
-import { ThemedText } from '@/components/ThemedText';
+import { YStack, XStack, Button, Spinner, Paragraph, H2, Input, Label, Select, Adapt, Sheet } from 'tamagui'; // Import Tamagui components
+import { Check, ChevronDown } from '@tamagui/lucide-icons'; // Icons for Select
+import { ThemedView } from '@/components/ThemedView'; // Keep ThemedView for background
 import { SupabaseProfileRepository } from '@/repositories/SupabaseProfileRepository';
 import { Bike, BikeStatus, BikeType } from 'bikr-shared'; // Import types/enums
+import { useAuth } from '@/hooks/useAuth'; // Needed for owner_id implicitly
 
-// TODO: Replace TextInput with Tamagui Input/Select if available
-// TODO: Add validation
+// TODO: Add validation (basic added)
 // TODO: Add fields for description, imageURL etc. if needed
 
 const profileRepository = new SupabaseProfileRepository();
 
+// Helper function to get enum keys
+function getEnumKeys<T extends string | number>(e: Record<string, T>): string[] {
+    return Object.keys(e).filter(k => typeof e[k as any] === 'number' || typeof e[k as any] === 'string');
+}
+
 export default function AddBikeScreen() {
   const router = useRouter();
+  const { user } = useAuth(); // Get user context
   const [name, setName] = useState('');
   const [type, setType] = useState<BikeType>(BikeType.STANDARD); // Default type
   const [status, setStatus] = useState<BikeStatus>(BikeStatus.AVAILABLE); // Default status
@@ -21,15 +28,24 @@ export default function AddBikeScreen() {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Memoize Select items
+  const bikeTypeItems = useMemo(() => getEnumKeys(BikeType).map(key => ({ name: key, value: BikeType[key as keyof typeof BikeType] })), []);
+  const bikeStatusItems = useMemo(() => getEnumKeys(BikeStatus).map(key => ({ name: key, value: BikeStatus[key as keyof typeof BikeStatus] })), []);
+
+
   const handleSave = async () => {
     // Basic validation
-    if (!name || !hourlyRate || isNaN(parseFloat(hourlyRate))) {
+    if (!name.trim() || !hourlyRate.trim() || isNaN(parseFloat(hourlyRate))) {
         Alert.alert('Invalid Input', 'Please enter a valid name and hourly rate.');
+        return;
+    }
+     if (!user) {
+        Alert.alert('Error', 'User not authenticated.');
         return;
     }
 
     const bikeData: Omit<Bike, 'id' | 'owner_id' | 'createdAt' | 'updatedAt'> = {
-        name,
+        name: name.trim(),
         type,
         status,
         hourlyRate: parseFloat(hourlyRate),
@@ -65,93 +81,124 @@ export default function AddBikeScreen() {
     }
   };
 
-
-  // TODO: Replace with Picker or Select components for Type and Status
-  const renderTypeSelector = () => (
-      <View>
-          <ThemedText>Type: {type}</ThemedText>
-          {/* Placeholder buttons to cycle type */}
-          <Button title="Set Standard" onPress={() => setType(BikeType.STANDARD)} />
-          <Button title="Set Road" onPress={() => setType(BikeType.ROAD)} />
-          {/* Add other types */}
-      </View>
-  );
-   const renderStatusSelector = () => (
-      <View>
-          <ThemedText>Status: {status}</ThemedText>
-           {/* Placeholder buttons to cycle status */}
-          <Button title="Set Available" onPress={() => setStatus(BikeStatus.AVAILABLE)} />
-          <Button title="Set Maintenance" onPress={() => setStatus(BikeStatus.MAINTENANCE)} />
-           {/* Add other statuses */}
-      </View>
-  );
-
-
   return (
-    <ThemedView style={styles.container}>
-      <ThemedText type="title">Add New Bike</ThemedText>
+    <ThemedView style={{ flex: 1 }}>
+        <ScrollView>
+            <YStack flex={1} padding="$4" space="$4">
+                <H2 textAlign="center">Add New Bike</H2>
 
-      <View style={styles.form}>
-          <ThemedText>Name:</ThemedText>
-          <TextInput
-            value={name}
-            onChangeText={setName}
-            placeholder="e.g., My Commuter, Weekend Warrior"
-            style={styles.input}
-          />
-          <ThemedText style={styles.label}>Hourly Rate (£):</ThemedText>
-           <TextInput
-            value={hourlyRate}
-            onChangeText={setHourlyRate}
-            placeholder="e.g., 10.50"
-            style={styles.input}
-            keyboardType="numeric"
-          />
+                <YStack space="$3" borderWidth={1} borderColor="$gray6" borderRadius="$4" padding="$3">
+                    <YStack>
+                        <Label htmlFor="bikeName">Name</Label>
+                        <Input
+                            id="bikeName"
+                            value={name}
+                            onChangeText={setName}
+                            placeholder="e.g., My Commuter, Weekend Warrior"
+                            disabled={isSaving}
+                        />
+                    </YStack>
+                    <YStack>
+                        <Label htmlFor="hourlyRate">Hourly Rate (£)</Label>
+                        <Input
+                            id="hourlyRate"
+                            value={hourlyRate}
+                            onChangeText={setHourlyRate}
+                            placeholder="e.g., 10.50"
+                            keyboardType="numeric"
+                            disabled={isSaving}
+                        />
+                    </YStack>
 
-          {/* TODO: Replace placeholders with actual Picker/Select components */}
-          {renderTypeSelector()}
-          {renderStatusSelector()}
+                    {/* Bike Type Select */}
+                    <YStack>
+                        <Label htmlFor="bikeType">Type</Label>
+                        <Select id="bikeType" value={type.toString()} onValueChange={(val) => setType(val as BikeType)} disablePreventBodyScroll>
+                            <Select.Trigger width="100%" iconAfter={ChevronDown}>
+                                <Select.Value placeholder="Select Type" />
+                            </Select.Trigger>
+                            {/* Remove Adapt wrapper */}
+                            <Sheet native modal dismissOnSnapToBottom>
+                                <Sheet.Frame>
+                                    <Sheet.ScrollView>
+                                        <Adapt.Contents />
+                                    </Sheet.ScrollView>
+                                </Sheet.Frame>
+                                <Sheet.Overlay />
+                            </Sheet>
+                            {/* </Adapt> */} {/* Adapt is implicitly handled by Sheet */}
+                            <Select.Content zIndex={200000}>
+                                <Select.Viewport minWidth={200}>
+                                    <Select.Group>
+                                        <Select.Label>Bike Type</Select.Label>
+                                        {bikeTypeItems.map((item, i) => (
+                                            <Select.Item index={i} key={item.name} value={item.value.toString()}>
+                                                <Select.ItemText>{item.name}</Select.ItemText>
+                                                <Select.ItemIndicator marginLeft="auto">
+                                                    <Check size={16} />
+                                                </Select.ItemIndicator>
+                                            </Select.Item>
+                                        ))}
+                                    </Select.Group>
+                                </Select.Viewport>
+                            </Select.Content>
+                        </Select>
+                    </YStack>
 
-          {error && <ThemedText style={styles.errorText}>Error: {error}</ThemedText>}
-      </View>
+                    {/* Bike Status Select */}
+                     <YStack>
+                        <Label htmlFor="bikeStatus">Status</Label>
+                        <Select id="bikeStatus" value={status.toString()} onValueChange={(val) => setStatus(val as BikeStatus)} disablePreventBodyScroll>
+                            <Select.Trigger width="100%" iconAfter={ChevronDown}>
+                                <Select.Value placeholder="Select Status" />
+                            </Select.Trigger>
+                             {/* Remove Adapt wrapper */}
+                            <Sheet native modal dismissOnSnapToBottom>
+                                <Sheet.Frame>
+                                    <Sheet.ScrollView>
+                                        <Adapt.Contents />
+                                    </Sheet.ScrollView>
+                                </Sheet.Frame>
+                                <Sheet.Overlay />
+                            </Sheet>
+                             {/* </Adapt> */} {/* Adapt is implicitly handled by Sheet */}
+                            <Select.Content zIndex={200000}>
+                                <Select.Viewport minWidth={200}>
+                                    <Select.Group>
+                                        <Select.Label>Bike Status</Select.Label>
+                                        {bikeStatusItems.map((item, i) => (
+                                            <Select.Item index={i} key={item.name} value={item.value.toString()}>
+                                                <Select.ItemText>{item.name}</Select.ItemText>
+                                                <Select.ItemIndicator marginLeft="auto">
+                                                    <Check size={16} />
+                                                </Select.ItemIndicator>
+                                            </Select.Item>
+                                        ))}
+                                    </Select.Group>
+                                </Select.Viewport>
+                            </Select.Content>
+                        </Select>
+                    </YStack>
 
-      {/* Replace Button with Tamagui Button if available */}
-      <View style={styles.buttonContainer}>
-          <Button title="Cancel" onPress={handleCancel} disabled={isSaving} />
-          <Button title="Add Bike" onPress={handleSave} disabled={isSaving} />
-      </View>
-       {isSaving && <ActivityIndicator style={{ marginTop: 10 }} />}
+                    {/* Add other fields like description, imageURL if needed */}
+
+                    {error && <Paragraph color="$red10" textAlign="center">{error}</Paragraph>}
+                </YStack>
+
+                {/* Action Buttons */}
+                <XStack justifyContent="space-around" marginTop="$3">
+                    <Button onPress={handleCancel} disabled={isSaving} theme="alt1">
+                        Cancel
+                    </Button>
+                    <Button onPress={handleSave} disabled={isSaving} theme="active" icon={isSaving ? () => <Spinner /> : undefined}>
+                        {isSaving ? 'Adding...' : 'Add Bike'}
+                    </Button>
+                </XStack>
+
+            </YStack>
+        </ScrollView>
     </ThemedView>
   );
 }
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        padding: 20,
-    },
-    form: {
-        marginVertical: 20,
-    },
-    label: {
-        marginTop: 15,
-        marginBottom: 5,
-    },
-    input: {
-        borderWidth: 1,
-        borderColor: 'grey',
-        padding: 10,
-        borderRadius: 5,
-        // Add theme colors
-    },
-    buttonContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-        marginTop: 20,
-    },
-    errorText: {
-        color: 'red',
-        marginTop: 10,
-        textAlign: 'center',
-    }
-});
+// StyleSheet removed

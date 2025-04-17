@@ -1,23 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Button, TextInput, ActivityIndicator, Alert } from 'react-native'; // Or use Tamagui components
+import { Alert, ScrollView } from 'react-native'; // Keep Alert, add ScrollView
 import { useRouter } from 'expo-router';
-import { ThemedView } from '@/components/ThemedView';
-import { ThemedText } from '@/components/ThemedText';
+import { YStack, XStack, Button, Spinner, Paragraph, H2, Input, Label, TextArea } from 'tamagui'; // Import Tamagui components
+import { ThemedView } from '@/components/ThemedView'; // Keep ThemedView for background
 import { useAuth } from '@/hooks/useAuth';
 import { SupabaseProfileRepository } from '@/repositories/SupabaseProfileRepository';
 import { User } from 'bikr-shared';
 
-// TODO: Replace TextInput with Tamagui Input if available
-// TODO: Add fields for bio, etc.
-// TODO: Implement better loading/error states for form
-// TODO: Handle avatar upload separately
+// TODO: Add fields for bio, etc. - Added basic fields
+// TODO: Handle avatar upload separately (done in profile/index.tsx)
 
 const profileRepository = new SupabaseProfileRepository();
 
 export default function EditProfileScreen() {
   const router = useRouter();
   const { user } = useAuth();
-  const [profileData, setProfileData] = useState<Partial<User>>({});
+  // State for editable fields
+  const [username, setUsername] = useState('');
+  const [fullName, setFullName] = useState('');
+  // State to hold the full profile for display purposes (non-editable fields)
+  const [fullProfile, setFullProfile] = useState<User | null>(null);
+
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -35,13 +38,14 @@ export default function EditProfileScreen() {
       try {
         const fetchedProfile = await profileRepository.getProfile(user.id);
         if (fetchedProfile) {
-          setProfileData({
-            username: fetchedProfile.username,
-            fullName: fetchedProfile.fullName,
-            // Add other editable fields here (e.g., bio)
-          });
+          setFullProfile(fetchedProfile); // Store full profile
+          // Set state for editable fields
+          setUsername(fetchedProfile.username || '');
+          setFullName(fetchedProfile.fullName || '');
+          // Add other editable fields here if needed in the future
         } else {
           setError('Profile not found.');
+          Alert.alert('Error', 'Could not load profile data.');
         }
       } catch (err: any) {
         console.error("Failed to fetch profile for editing:", err);
@@ -54,19 +58,33 @@ export default function EditProfileScreen() {
     fetchProfile();
   }, [user?.id]);
 
-  const handleInputChange = (field: keyof Partial<User>, value: string) => {
-    setProfileData(prev => ({ ...prev, [field]: value }));
-  };
-
   const handleSave = async () => {
-    if (!profileData || Object.keys(profileData).length === 0) {
-        Alert.alert('No Changes', 'No changes detected to save.');
+    // Basic validation could be added here (e.g., check username length)
+    if (!username && !fullName) {
+        Alert.alert('No Changes', 'Please enter a username or full name.');
         return;
     }
+
     setIsSaving(true);
     setError(null);
     try {
-        const updatedProfile = await profileRepository.updateProfile(profileData);
+        // Only send editable fields that have actually changed
+        const dataToSave: Partial<User> = {};
+        if (username !== (fullProfile?.username || '')) {
+            dataToSave.username = username;
+        }
+        if (fullName !== (fullProfile?.fullName || '')) {
+            dataToSave.fullName = fullName;
+        }
+        // Add other fields if they become editable
+
+        if (Object.keys(dataToSave).length === 0) {
+             Alert.alert('No Changes', 'No changes detected to save.');
+             setIsSaving(false);
+             return;
+        }
+
+        const updatedProfile = await profileRepository.updateProfile(dataToSave);
         console.log('Profile updated:', updatedProfile);
         Alert.alert('Success', 'Profile updated successfully!');
         // Navigate back to profile view on success
@@ -94,65 +112,105 @@ export default function EditProfileScreen() {
 
   if (isLoading) {
     return (
-        <ThemedView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <ActivityIndicator size="large" />
-            <ThemedText>Loading profile...</ThemedText>
+        // Use ThemedView for background, YStack for centering
+        <ThemedView style={{ flex: 1 }}>
+            <YStack flex={1} justifyContent="center" alignItems="center">
+                <Spinner size="large" />
+                <Paragraph marginTop="$2">Loading profile...</Paragraph>
+            </YStack>
         </ThemedView>
     );
   }
 
-  if (error && !profileData) { // Show error only if loading failed completely
+  // Check if essential data is missing due to error
+  if (error && !fullProfile) {
      return (
-        <ThemedView style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 }}>
-            <ThemedText style={{ color: 'red', marginBottom: 15 }}>Error: {error}</ThemedText>
-            <Button title="Go Back" onPress={handleCancel} />
+        // Use ThemedView for background, YStack for centering
+        <ThemedView style={{ flex: 1 }}>
+            <YStack flex={1} justifyContent="center" alignItems="center" padding="$4" space="$3">
+                <Paragraph color="$red10" textAlign="center">Error: {error}</Paragraph>
+                {/* Use Tamagui Button */}
+                <Button onPress={handleCancel}>Go Back</Button>
+            </YStack>
         </ThemedView>
     );
   }
 
+  // Main content rendering using Tamagui
   return (
-    <ThemedView style={{ flex: 1, padding: 20 }}>
-      <ThemedText type="title">Edit Profile</ThemedText>
+    // Use ThemedView for background, add ScrollView for content
+    <ThemedView style={{ flex: 1 }}>
+        <ScrollView>
+            <YStack flex={1} padding="$4" space="$4">
+                <H2 textAlign="center">Edit Profile</H2>
 
-      {/* Placeholder for profile edit form */}
-      <View style={{ marginVertical: 20, padding: 15 }}>
-          <ThemedText>Username:</ThemedText>
-          <TextInput
-            value={profileData.username || ''}
-            onChangeText={(text) => handleInputChange('username', text)}
-            placeholder="Enter username"
-            style={styles.input} // Add basic styling
-          />
-          <ThemedText style={{ marginTop: 10 }}>Full Name:</ThemedText>
-           <TextInput
-            value={profileData.fullName || ''}
-            onChangeText={(text) => handleInputChange('fullName', text)}
-            placeholder="Enter full name"
-            style={styles.input} // Add basic styling
-          />
-          {/* Add other fields like Bio */}
-          {error && <ThemedText style={{ color: 'red', marginTop: 10 }}>Error: {error}</ThemedText>}
-      </View>
+                {/* Form using YStack */}
+                <YStack space="$3" borderWidth={1} borderColor="$gray6" borderRadius="$4" padding="$3">
+                    <YStack>
+                        <Label htmlFor="username">Username</Label>
+                        <Input
+                            id="username"
+                            value={username}
+                            onChangeText={setUsername}
+                            placeholder="Enter username"
+                            disabled={isSaving}
+                        />
+                    </YStack>
+                    <YStack>
+                        <Label htmlFor="fullName">Full Name</Label>
+                        <Input
+                            id="fullName"
+                            value={fullName}
+                            onChangeText={setFullName}
+                            placeholder="Enter full name"
+                            disabled={isSaving}
+                        />
+                    </YStack>
+                    {/* Display non-editable fields */}
+                     <YStack>
+                        <Label>Email (Cannot Change)</Label>
+                        <Paragraph color="$gray10">{fullProfile?.email || 'N/A'}</Paragraph>
+                    </YStack>
+                     <YStack>
+                        <Label>Experience Level</Label>
+                        <Paragraph>{fullProfile?.experienceLevel || 'Not set'}</Paragraph>
+                    </YStack>
+                     <YStack>
+                        <Label>Interests</Label>
+                        {fullProfile?.interests && fullProfile.interests.length > 0 ? (
+                            <XStack flexWrap='wrap' space="$1" marginTop="$1">
+                                {fullProfile.interests.map(interest => (
+                                <Paragraph key={interest} size="$2" paddingHorizontal="$2" paddingVertical="$1" backgroundColor="$blue5" borderRadius="$2" color="$blue11">
+                                    {interest}
+                                </Paragraph>
+                                ))}
+                            </XStack>
+                            ) : (
+                            <Paragraph size="$2" color="$gray10">Not set</Paragraph>
+                        )}
+                    </YStack>
+                    {/* Add other fields like Bio (e.g., using TextArea) */}
+                    {/* <YStack>
+                        <Label htmlFor="bio">Bio</Label>
+                        <TextArea id="bio" placeholder="Tell us about yourself..." />
+                    </YStack> */}
 
-      {/* Replace Button with Tamagui Button if available */}
-      <View style={{ flexDirection: 'row', justifyContent: 'space-around', width: '80%', alignSelf: 'center' }}>
-          <Button title="Cancel" onPress={handleCancel} disabled={isSaving} />
-          <Button title="Save Changes" onPress={handleSave} disabled={isSaving} />
-      </View>
-      {isSaving && <ActivityIndicator style={{ marginTop: 10 }} />}
+                    {/* Display save error */}
+                    {error && <Paragraph color="$red10" textAlign="center">{error}</Paragraph>}
+                </YStack>
+
+                {/* Action Buttons */}
+                <XStack justifyContent="space-around" marginTop="$3">
+                    <Button onPress={handleCancel} disabled={isSaving} theme="alt1">
+                        Cancel
+                    </Button>
+                    <Button onPress={handleSave} disabled={isSaving} theme="active" icon={isSaving ? () => <Spinner /> : undefined}>
+                        {isSaving ? 'Saving...' : 'Save Changes'}
+                    </Button>
+                </XStack>
+
+            </YStack>
+        </ScrollView>
     </ThemedView>
   );
 }
-
-// Basic styling (replace with Tamagui styles if preferred)
-const styles = {
-    input: {
-        borderWidth: 1,
-        borderColor: 'grey',
-        padding: 10,
-        marginTop: 5,
-        borderRadius: 5,
-        // Add color based on theme if needed
-    }
-};
-// REMOVE DUPLICATED CODE BLOCK BELOW THIS LINE

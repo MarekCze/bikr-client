@@ -9,7 +9,7 @@ export default function WelcomeScreen() {
 
   const handleNext = () => {
     // Navigate to the next onboarding step (e.g., interests)
-    router.push('/onboarding/interests'); // Adjust route name as needed
+    router.push('./interests'); // Use relative path
   };
 
   return (

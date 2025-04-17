@@ -12,33 +12,33 @@
    - **Goal:** Ensure a robust way to interact with backend profile data.
    - **Subtasks:**
      - [x] **Verify Existence:** Checked, directory was empty.
-     - [x] **Define Interface:** `IProfileRepository.ts` created.
-     - [x] **Implement Repository:** `SupabaseProfileRepository.ts` created. Implemented `getProfile`, `updateProfile`, `uploadAvatar`, `getGarage`, `addBike`, `updateBike`. (*Note: `uploadAvatar` needs file conversion handling; `deleteBike` is still a TODO.*)
-     - [x] **Integrate Shared Types:** Corrected types to `User` and `Bike`. Path alias added to `tsconfig.json`.
-     - [x] **Unit Tests:** Basic tests for `getProfile`, `updateProfile`, `uploadAvatar` added in `SupabaseProfileRepository.test.ts`. Mocks corrected.
+     - [x] **Define Interface:** `IProfileRepository.ts` created and updated (`updateBike` signature).
+     - [x] **Implement Repository:** `SupabaseProfileRepository.ts` created. Implemented `getProfile`, `updateProfile`, `uploadAvatar`, `getGarage`, `addBike`, `updateBike`, `deleteBike`. (*Note: `uploadAvatar` needs file conversion handling.*)
+     - [x] **Integrate Shared Types:** Corrected types to `User` and `Bike`. Added `interests` and `experienceLevel` to `User`. Path alias added to `tsconfig.json`. Fixed `bikr-shared/tsconfig.json`.
+     - [x] **Unit Tests:** Basic tests for `getProfile`, `updateProfile`, `uploadAvatar`, `deleteBike` added in `SupabaseProfileRepository.test.ts`. Mocks corrected.
 
 ### 2. User Onboarding Flow Implementation - Basic Structure COMPLETE*
    - **Goal:** Guide new users through initial setup after registration.
    - **Subtasks:**
      - [x] **Create Directory Structure:** Created `app/onboarding/` and `components/onboarding/`.
-     - [x] **Implement Navigation:** Created `app/onboarding/_layout.tsx` with Stack navigator listing screens. Basic `router.push/replace` added to screens. (*Note: Needs logic for redirecting after signup.*)
-     - [x] **Screen: Welcome:** Created `app/onboarding/welcome.tsx` with placeholder UI.
-     - [x] **Screen: Interests Selection:** Created `app/onboarding/interests.tsx` with placeholder UI. (*TODO: Implement UI, data fetching/saving.*)
-     - [x] **Screen: Experience Level:** Created `app/onboarding/experience.tsx` with placeholder UI. (*TODO: Implement UI, data saving.*)
-     - [x] **Screen: Bike Setup (Initial Garage):** Created `app/onboarding/bike-setup.tsx` with placeholder UI. (*TODO: Implement UI, data saving.*)
-     - [x] **Screen: Permissions Request:** Created `app/onboarding/permissions.tsx` with placeholder UI. (*TODO: Implement permission requests.*)
-     - [ ] **Flow Completion:** Placeholder navigation added in `permissions.tsx`. (*TODO: Finalize navigation target.*)
+     - [x] **Implement Navigation:** Created `app/onboarding/_layout.tsx` with Stack navigator listing screens. Basic `router.push/replace` added to screens, paths corrected to relative. (*Note: Needs logic for redirecting after signup.*)
+     - [x] **Screen: Welcome:** Created `app/onboarding/welcome.tsx` and updated navigation path.
+     - [x] **Screen: Interests Selection:** Implemented UI (Tamagui tags), state management, and saving via `updateProfile`. Added `interests` field to `User` type.
+     - [x] **Screen: Experience Level:** Implemented UI (Tamagui buttons), state management, and saving via `updateProfile`. Added `experienceLevel` field to `User` type.
+     - [x] **Screen: Bike Setup (Initial Garage):** Implemented UI (Tamagui form adapted from `add-bike`), state management, and saving via `addBike`.
+     - [x] **Screen: Permissions Request:** Implemented permission requests using `expo-location` and `expo-notifications`. Installed `expo-location`.
+     - [x] **Flow Completion:** Navigation to `/(tabs)` implemented in `permissions.tsx`.
 
 ### 3. Profile Management Implementation - Basic Structure & Initial Logic COMPLETE*
    - **Goal:** Allow users to view and manage their profile information.
    - **Subtasks:**
      - [x] **Create Directory Structure:** Created `app/profile/`, `components/profile/`, placeholder screens (`index`, `edit`, `garage`, `settings`, `add-bike`, `edit-bike/[id]`), and stack layout (`_layout.tsx`).
-     - [x] **Screen: Profile View/Edit:** Implemented basic data fetching/display in `index.tsx`. Implemented basic form state, fetching, and update logic in `edit.tsx`.
-     - [x] **Feature: Avatar Management:** Added UI elements and integrated `expo-image-picker` logic in `index.tsx`. Implemented `uploadAvatar` in repository.
-     - [x] **Screen: Garage Management:** Implemented basic data fetching/display in `garage.tsx`. Implemented `getGarage` in repository. Implemented basic form state/save logic in `add-bike.tsx`. Implemented `addBike` in repository. Implemented basic form state/fetch/update logic in `edit-bike/[id].tsx`. Implemented `updateBike` in repository.
-     - [x] **Screen: Privacy Settings:** Created placeholder screen `settings.tsx` with basic UI structure.
-     - [ ] **Integrate Components:** (*TODO: Replace placeholders with actual Tamagui components, refine UI.*)
-     - [ ] **Repository Integration:** (*TODO: Fully integrate UI actions with repository methods, handle errors/loading states robustly, implement remaining methods like `deleteBike`.*)
+     - [x] **Screen: Profile View/Edit:** Refactored `index.tsx` and `edit.tsx` with Tamagui components. Implemented data fetching/display/update logic. Added display for interests/experience.
+     - [x] **Feature: Avatar Management:** Integrated `expo-image-picker` logic in `index.tsx`. Implemented `uploadAvatar` in repository. UI uses Tamagui.
+     - [x] **Screen: Garage Management:** Refactored `garage.tsx`, `add-bike.tsx`, `edit-bike/[id].tsx` with Tamagui components. Implemented `getGarage`, `addBike`, `updateBike`, `deleteBike` repository methods and integrated them into the UI with loading/error handling.
+     - [x] **Screen: Privacy Settings:** Refactored placeholder screen `settings.tsx` with Tamagui components. (*Note: Save logic still placeholder.*)
+     - [x] **Integrate Components:** Replaced placeholders with Tamagui components across profile screens.
+     - [x] **Repository Integration:** Integrated UI actions with repository methods (`getProfile`, `updateProfile`, `uploadAvatar`, `getGarage`, `addBike`, `updateBike`, `deleteBike`). Added basic loading/error state handling.
 
 ### 4. Remaining Authentication Methods (Lower Priority / Optional)
    - **Goal:** Add alternative login methods as defined in Phase 1.
@@ -48,4 +48,4 @@
      - [ ] **Biometric Login:** Implement using `expo-local-authentication` for subsequent logins after initial authentication.
 
 ---
-**Status:** Phase 1 Profile/Onboarding structure and basic logic implemented. Requires UI refinement and full repository integration.
+**Status:** Phase 1 Profile/Onboarding features implemented, including repository methods, onboarding flow screens, and profile management screens refactored with Tamagui components. Core functionality is complete.

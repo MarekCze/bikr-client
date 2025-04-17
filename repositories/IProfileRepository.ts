@@ -41,10 +41,11 @@ export interface IProfileRepository {
 
   /**
    * Updates an existing bike in the current user's garage.
-   * @param bikeData - The updated bike data, including its ID.
+   * @param bikeData - The partial bike data to update, MUST include the bike's ID.
    * @returns A promise that resolves with the updated bike data.
    */
-  updateBike(bikeData: Bike): Promise<Bike | null>; // Use Bike type
+  // Allow partial updates, requiring ID
+  updateBike(bikeData: Partial<Omit<Bike, 'id'>> & { id: string }): Promise<Bike | null>;
 
   /**
    * Deletes a bike from the current user's garage.

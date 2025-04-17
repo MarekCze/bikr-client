@@ -7,6 +7,7 @@
 - [x] Jest testing configuration (`bikr-client/components/__tests__`)
 - [x] Session persistence with MMKV storage (`bikr-client/hooks/useAuth.ts`)
 - [x] Usage of shared types/schemas from `bikr-shared`
+- [x] Phase 1 Profile & Onboarding Features (Repository, Screens, Tamagui Refactor)
 
 ## Current Focus Areas
 1. Debugging and Fixing Critical Issues

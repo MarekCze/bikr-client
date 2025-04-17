@@ -1,16 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Button, ActivityIndicator, Alert, Image, StyleSheet, Platform } from 'react-native'; // Or use Tamagui components
+import { Alert } from 'react-native';
 import { useRouter } from 'expo-router';
-import * as ImagePicker from 'expo-image-picker'; // Import image picker
-import { ThemedView } from '@/components/ThemedView';
-import { ThemedText } from '@/components/ThemedText';
+import * as ImagePicker from 'expo-image-picker';
+import { YStack, XStack, Button, Spinner, Paragraph, H2, Image, Separator, ScrollView } from 'tamagui'; // Import Tamagui components
 import { useAuth } from '@/hooks/useAuth';
-import { SupabaseProfileRepository } from '@/repositories/SupabaseProfileRepository'; // Adjust path if needed
+import { SupabaseProfileRepository } from '@/repositories/SupabaseProfileRepository';
 import { User } from 'bikr-shared';
+import { ThemedView } from '@/components/ThemedView'; // Keep ThemedView for background
 
-// TODO: Display more profile info (bio)
-// TODO: Implement error handling more gracefully
-// TODO: Handle Blob/File conversion for upload if needed
+// TODO: Display more profile info (bio) - Added interests/experience
+// TODO: Handle Blob/File conversion for upload if needed in repo
 
 const profileRepository = new SupabaseProfileRepository();
 
@@ -19,7 +18,7 @@ export default function ProfileScreen() {
   const { user } = useAuth();
   const [profile, setProfile] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false); // Specific loading state for avatar
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Fetch profile data
@@ -38,165 +37,150 @@ export default function ProfileScreen() {
       } catch (err: any) {
         console.error("Failed to fetch profile:", err);
         setError(err.message || 'Failed to load profile.');
-        Alert.alert('Error', 'Could not load your profile.'); // Simple error feedback
+        // Alert.alert('Error', 'Could not load your profile.'); // Avoid alert for initial load error
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchProfile();
-  }, [user?.id]); // Refetch if user ID changes
+  }, [user?.id]);
 
-  // Use relative paths for navigation within the same route group
+  // Navigation functions
   const goToEditProfile = () => router.push('./edit');
   const goToGarage = () => router.push('./garage');
   const goToSettings = () => router.push('./settings');
 
+  // Avatar change handler
   const handleChangeAvatar = async () => {
-    // Request media library permissions
     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (permissionResult.granted === false) {
-      Alert.alert("Permission required", "You need to allow access to your photos to change your avatar.");
+    if (!permissionResult.granted) {
+      Alert.alert("Permission required", "Allow access to photos to change avatar.");
       return;
     }
 
-    // Launch image picker
     const pickerResult = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
-      aspect: [1, 1], // Square aspect ratio for avatars
-      quality: 0.5, // Reduce quality to save storage/bandwidth
+      aspect: [1, 1],
+      quality: 0.5,
     });
 
-    if (pickerResult.canceled) {
-      console.log('Image selection cancelled.');
-      return;
-    }
+    if (pickerResult.canceled) return;
 
-    // Handle the selected image
     const selectedImageUri = pickerResult.assets[0].uri;
-    console.log('Selected image URI:', selectedImageUri);
-
-    // Upload the image
     setIsUploadingAvatar(true);
-    setError(null); // Clear previous errors
+    setError(null);
     try {
-      // Pass the URI directly, repository needs to handle conversion if necessary
       const newAvatarUrl = await profileRepository.uploadAvatar(selectedImageUri);
       if (newAvatarUrl && profile) {
-         // Optimistically update UI
-         setProfile({ ...profile, avatarUrl: newAvatarUrl });
-         Alert.alert('Success', 'Avatar updated!');
-      } else if (!newAvatarUrl) {
-          // Handle case where upload succeeded but URL retrieval or profile update failed in repo
-          Alert.alert('Upload Issue', 'Avatar uploaded, but failed to update profile link.');
+        setProfile({ ...profile, avatarUrl: newAvatarUrl });
+        Alert.alert('Success', 'Avatar updated!');
+      } else {
+        Alert.alert('Upload Issue', 'Avatar uploaded, but failed to update profile link.');
       }
     } catch (uploadError: any) {
-       console.error("Failed to upload avatar:", uploadError);
-       Alert.alert('Upload Failed', uploadError.message || 'Could not upload avatar.');
-       setError(uploadError.message || 'Could not upload avatar.'); // Show error state
+      console.error("Failed to upload avatar:", uploadError);
+      Alert.alert('Upload Failed', uploadError.message || 'Could not upload avatar.');
+      setError(uploadError.message || 'Could not upload avatar.');
     } finally {
-       setIsUploadingAvatar(false);
+      setIsUploadingAvatar(false);
     }
   };
 
-
+  // Render profile content
   const renderProfileDetails = () => {
     if (isLoading) {
-      return <ActivityIndicator size="large" style={styles.centered} />;
+      return <Spinner size="large" marginVertical="$4" />;
     }
-    // Show general loading indicator OR specific avatar upload indicator
-    if (isUploadingAvatar) {
-        return <ActivityIndicator size="large" style={styles.centered} />;
+    if (error && !profile) {
+      return <Paragraph color="$red10" textAlign="center">Error loading profile: {error}</Paragraph>;
     }
-    if (error && !profile) { // Show error only if profile failed to load initially
-      return <ThemedText style={styles.errorText}>Error loading profile: {error}</ThemedText>;
+    if (!profile) {
+      return <Paragraph textAlign="center">No profile data found. Maybe complete onboarding?</Paragraph>;
     }
-     if (!profile) {
-      return <ThemedText style={styles.centered}>No profile data found. Maybe complete onboarding?</ThemedText>;
-      // TODO: Potentially redirect to onboarding if profile is null?
-    }
-    // Profile loaded, potentially show upload error separately if needed
+
     return (
-      <View style={styles.profileContainer}>
-         <Image
-            source={profile.avatarUrl ? { uri: profile.avatarUrl } : require('@/assets/images/icon.png')} // Use default icon as placeholder
-            style={styles.avatar}
-          />
-          <Button title="Change Avatar" onPress={handleChangeAvatar} disabled={isUploadingAvatar} />
-           {/* Display upload error if it occurred */}
-           {error && <ThemedText style={[styles.errorText, { marginTop: 5 }]}>Upload Error: {error}</ThemedText>}
-          <View style={styles.detailsText}>
-              <ThemedText>Username: {profile.username || 'Not set'}</ThemedText>
-              <ThemedText>Email: {profile.email}</ThemedText>
-              <ThemedText>Full Name: {profile.fullName || 'Not set'}</ThemedText>
-              {/* Add Bio, etc. */}
-          </View>
-      </View>
+      <YStack alignItems="center" space="$3">
+        <Image
+          source={profile.avatarUrl ? { uri: profile.avatarUrl, width: 100, height: 100 } : require('@/assets/images/icon.png')}
+          width={100}
+          height={100}
+          borderRadius={50}
+          backgroundColor="$gray5" // Placeholder background
+        />
+        <Button onPress={handleChangeAvatar} disabled={isUploadingAvatar} size="$3" icon={isUploadingAvatar ? () => <Spinner /> : undefined}>
+          {isUploadingAvatar ? 'Uploading...' : 'Change Avatar'}
+        </Button>
+        {error && !isLoading && <Paragraph color="$red10" fontSize="$2" marginTop="$1">Upload Error: {error}</Paragraph>}
+
+        <Separator marginVertical="$3" width="90%" />
+
+        <YStack alignSelf="stretch" space="$2" paddingHorizontal="$2">
+          <XStack justifyContent='space-between'>
+            <Paragraph fontWeight="bold">Username:</Paragraph>
+            <Paragraph>{profile.username || 'Not set'}</Paragraph>
+          </XStack>
+          <XStack justifyContent='space-between'>
+            <Paragraph fontWeight="bold">Email:</Paragraph>
+            <Paragraph>{profile.email}</Paragraph>
+          </XStack>
+          <XStack justifyContent='space-between'>
+            <Paragraph fontWeight="bold">Full Name:</Paragraph>
+            <Paragraph>{profile.fullName || 'Not set'}</Paragraph>
+          </XStack>
+          <XStack justifyContent='space-between'>
+            <Paragraph fontWeight="bold">Experience:</Paragraph>
+            <Paragraph>{profile.experienceLevel || 'Not set'}</Paragraph>
+          </XStack>
+          <YStack>
+            <Paragraph fontWeight="bold">Interests:</Paragraph>
+            {profile.interests && profile.interests.length > 0 ? (
+              <XStack flexWrap='wrap' space="$1" marginTop="$1">
+                {profile.interests.map(interest => (
+                  <Paragraph key={interest} size="$2" paddingHorizontal="$2" paddingVertical="$1" backgroundColor="$blue5" borderRadius="$2" color="$blue11">
+                    {interest}
+                  </Paragraph>
+                ))}
+              </XStack>
+            ) : (
+              <Paragraph size="$2" color="$gray10">Not set</Paragraph>
+            )}
+          </YStack>
+          {/* Add Bio, etc. */}
+        </YStack>
+      </YStack>
     );
   };
 
   return (
-    <ThemedView style={{ flex: 1, padding: 20 }}>
-      <ThemedText type="title" style={styles.title}>My Profile</ThemedText>
+    // Use ThemedView for potential theme background, YStack for layout
+    <ThemedView style={{ flex: 1 }}>
+        <ScrollView>
+            <YStack flex={1} padding="$4" space="$4">
+                <H2 textAlign="center">My Profile</H2>
 
-      {/* Display profile details */}
-      <View style={styles.detailsBox}>
-        {renderProfileDetails()}
-      </View>
+                {/* Display profile details */}
+                <YStack borderWidth={1} borderColor="$gray6" borderRadius="$4" padding="$3" minHeight={150}>
+                    {renderProfileDetails()}
+                </YStack>
 
-      {/* Replace Button with Tamagui Button if available */}
-      <View style={styles.buttonContainer}>
-          <Button title="Edit Profile" onPress={goToEditProfile} disabled={!profile || isLoading} />
-          <View style={styles.buttonSpacer} />
-          <Button title="My Garage" onPress={goToGarage} />
-          <View style={styles.buttonSpacer} />
-          <Button title="Settings" onPress={goToSettings} />
-      </View>
-
+                {/* Navigation Buttons */}
+                <YStack space="$3">
+                    <Button onPress={goToEditProfile} disabled={!profile || isLoading || isUploadingAvatar} theme="active">
+                        Edit Profile
+                    </Button>
+                    <Button onPress={goToGarage}>
+                        My Garage
+                    </Button>
+                    <Button onPress={goToSettings}>
+                        Settings
+                    </Button>
+                </YStack>
+            </YStack>
+        </ScrollView>
     </ThemedView>
   );
 }
 
-const styles = StyleSheet.create({
-    title: {
-        marginBottom: 10,
-    },
-    detailsBox: {
-        marginVertical: 15,
-        padding: 15,
-        borderWidth: 1,
-        borderColor: 'grey', // Use theme color later
-        borderRadius: 8,
-        minHeight: 150, // Adjust as needed
-    },
-    profileContainer: {
-        alignItems: 'center', // Center avatar and button
-    },
-    avatar: {
-        width: 100,
-        height: 100,
-        borderRadius: 50,
-        marginBottom: 10,
-        backgroundColor: '#ccc', // Placeholder background
-    },
-    detailsText: {
-        marginTop: 15,
-        alignSelf: 'stretch', // Make text container take width
-    },
-    buttonContainer: {
-        marginTop: 20,
-    },
-    buttonSpacer: {
-        height: 10,
-    },
-    centered: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    errorText: {
-        color: 'red',
-        textAlign: 'center',
-    }
-});
+// Remove StyleSheet - styling is done inline with Tamagui props

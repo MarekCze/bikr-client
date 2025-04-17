@@ -1,54 +1,73 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Button, Alert } from 'react-native'; // Or use Tamagui components
+import { View, Text, Button, Alert, ActivityIndicator } from 'react-native'; // Added ActivityIndicator
 import { useRouter } from 'expo-router';
 import { ThemedView } from '@/components/ThemedView';
 import { ThemedText } from '@/components/ThemedText';
 // Import permission request functions from Expo
-// import * as Location from 'expo-location';
-// import * as Notifications from 'expo-notifications';
+import * as Location from 'expo-location';
+import * as Notifications from 'expo-notifications';
+import { Platform } from 'react-native'; // Import Platform
 
-// TODO: Implement actual permission requests using Expo libraries
-// TODO: Handle different permission statuses (granted, denied, undetermined)
+// TODO: Handle different permission statuses (granted, denied, undetermined) - Basic handling added
 // TODO: Potentially store permission status if needed elsewhere
 
 export default function PermissionsScreen() {
   const router = useRouter();
-  const [locationStatus, setLocationStatus] = useState<string | null>(null); // Example state
-  const [notificationStatus, setNotificationStatus] = useState<string | null>(null); // Example state
+  // Removed duplicate locationStatus state declaration
+  const [locationStatus, setLocationStatus] = useState<Location.PermissionStatus | null>(null); // Use enum type
+  const [notificationStatus, setNotificationStatus] = useState<Notifications.PermissionStatus | null>(null); // Use enum type
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Example function to request permissions (replace with actual implementation)
+  // Function to request permissions
   const requestPermissions = async () => {
-    // --- Location ---
-    // const { status: location } = await Location.requestForegroundPermissionsAsync();
-    // setLocationStatus(location);
-    // if (location !== 'granted') {
-    //   Alert.alert('Permission Denied', 'Location permission is needed for some features.');
-    //   // Handle denial - maybe allow proceeding anyway?
-    // }
-    setLocationStatus('granted'); // Placeholder
+    setIsLoading(true);
+    let finalLocationStatus: Location.PermissionStatus = Location.PermissionStatus.UNDETERMINED;
+    let finalNotificationStatus: Notifications.PermissionStatus = Notifications.PermissionStatus.UNDETERMINED;
 
-    // --- Notifications ---
-    // const { status: notifications } = await Notifications.requestPermissionsAsync();
-    // setNotificationStatus(notifications);
-    // if (notifications !== 'granted') {
-    //   Alert.alert('Permission Denied', 'Notifications allow us to keep you updated.');
-    //   // Handle denial
-    // }
-    setNotificationStatus('granted'); // Placeholder
+    try {
+        // --- Location ---
+        const { status: location } = await Location.requestForegroundPermissionsAsync();
+        finalLocationStatus = location;
+        setLocationStatus(location);
+        if (location !== 'granted') {
+            Alert.alert('Location Permission', 'Location permission is recommended for features like finding nearby routes.');
+            // Allow proceeding even if denied
+        }
 
-    // Allow proceeding even if denied for now, or add logic to block/guide user
-    console.log('Permissions requested (Placeholder)');
+        // --- Notifications ---
+        const { status: notifications } = await Notifications.requestPermissionsAsync();
+        finalNotificationStatus = notifications;
+        setNotificationStatus(notifications);
+        if (notifications !== 'granted') {
+            Alert.alert('Notification Permission', 'Notifications help keep you updated, but are optional.');
+            // Allow proceeding even if denied
+        }
+
+        console.log('Permissions requested:', { location: finalLocationStatus, notifications: finalNotificationStatus });
+
+    } catch (error: any) {
+        console.error("Error requesting permissions:", error);
+        Alert.alert('Error', 'Could not request permissions.');
+    } finally {
+        setIsLoading(false);
+    }
   };
 
-  // Request permissions when the screen mounts (or trigger via button)
+  // Check initial status on mount (optional, but good practice)
   useEffect(() => {
-    // requestPermissions(); // Uncomment to request on mount
+    const checkInitialStatus = async () => {
+        const locStatus = await Location.getForegroundPermissionsAsync();
+        setLocationStatus(locStatus.status);
+        const notifStatus = await Notifications.getPermissionsAsync();
+        setNotificationStatus(notifStatus.status);
+    };
+    checkInitialStatus();
   }, []);
 
   const handleFinish = () => {
     // Navigate to the main app screen (e.g., the tabs layout)
     // Replace '/(tabs)' with the actual route for the main app entry point
-    router.replace('/(tabs)');
+    router.replace('/(tabs)'); // Assuming this is the correct root layout path
   };
 
   const handleBack = () => {
@@ -57,7 +76,7 @@ export default function PermissionsScreen() {
         router.back();
     } else {
         // Fallback if cannot go back
-        router.replace('/onboarding/bike-setup');
+        router.replace('./bike-setup'); // Use relative path
     }
   };
 
@@ -68,17 +87,33 @@ export default function PermissionsScreen() {
         To get the most out of bikR, please grant location and notification permissions.
       </ThemedText>
 
-      {/* Placeholder for permission status/request UI */}
-      <View style={{ marginVertical: 20, alignItems: 'center' }}>
-          <ThemedText>Location Status: {locationStatus || 'Not Requested'}</ThemedText>
-          <ThemedText>Notification Status: {notificationStatus || 'Not Requested'}</ThemedText>
-          <Button title="Request Permissions" onPress={requestPermissions} />
+      {/* Display permission status and request button */}
+      <View style={{ marginVertical: 20, alignItems: 'stretch', width: '85%' }}>
+          <View style={{ marginBottom: 15, padding: 10, borderWidth: 1, borderColor: 'lightgrey', borderRadius: 5 }}>
+              <ThemedText>Location: {locationStatus || 'Checking...'}</ThemedText>
+              {locationStatus !== Location.PermissionStatus.GRANTED && (
+                  <ThemedText style={{ fontSize: 12, color: 'grey' }}>Needed for nearby features.</ThemedText>
+              )}
+          </View>
+          <View style={{ marginBottom: 20, padding: 10, borderWidth: 1, borderColor: 'lightgrey', borderRadius: 5 }}>
+              <ThemedText>Notifications: {notificationStatus || 'Checking...'}</ThemedText>
+               {notificationStatus !== Notifications.PermissionStatus.GRANTED && (
+                  <ThemedText style={{ fontSize: 12, color: 'grey' }}>Allows us to send updates.</ThemedText>
+              )}
+          </View>
+          <Button
+            title={locationStatus === 'granted' && notificationStatus === 'granted' ? "Permissions Granted" : "Grant Permissions"}
+            onPress={requestPermissions}
+            disabled={isLoading || (locationStatus === 'granted' && notificationStatus === 'granted')}
+          />
       </View>
+
+      {isLoading && <ActivityIndicator size="large" style={{ marginBottom: 15 }} />}
 
       {/* Replace Button with Tamagui Button if available */}
       <View style={{ flexDirection: 'row', justifyContent: 'space-around', width: '80%', marginBottom: 10 }}>
-          <Button title="Back" onPress={handleBack} />
-          <Button title="Finish Setup" onPress={handleFinish} />
+          <Button title="Back" onPress={handleBack} disabled={isLoading} />
+          <Button title="Finish Setup" onPress={handleFinish} disabled={isLoading} />
       </View>
     </ThemedView>
   );

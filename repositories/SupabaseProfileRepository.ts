@@ -188,15 +188,18 @@ export class SupabaseProfileRepository implements IProfileRepository {
     } // <-- Add missing closing brace for addBike try-catch
   } // Correct closing brace for addBike method
 
-  async updateBike(bikeData: Bike): Promise<Bike | null> {
+  // Update method signature to match interface
+  async updateBike(bikeData: Partial<Omit<Bike, 'id'>> & { id: string }): Promise<Bike | null> {
     try {
-      if (!bikeData.id) {
-        throw new Error('Bike ID is required for update.');
-      }
+      // ID is guaranteed by the type signature now
+      const { id, ...updateData } = bikeData; // Separate ID from the rest of the data
 
-      // Exclude fields that shouldn't be updated directly or are generated
-      // Removed owner_id as it's not on the Bike type
-      const { id, createdAt, updatedAt, ...updateData } = bikeData;
+      // Ensure updateData is not empty if needed, though Supabase might handle it
+      if (Object.keys(updateData).length === 0) {
+          console.warn('updateBike called with no data to update besides ID.');
+          // Optionally fetch and return the current bike data or return null/throw error
+          // For now, proceed with the potentially empty update
+      }
 
       const { data, error } = await supabase
         .from('bikes') // Assuming 'bikes' table
@@ -219,9 +222,20 @@ export class SupabaseProfileRepository implements IProfileRepository {
   }
 
   async deleteBike(bikeId: string): Promise<void> {
-    // TODO: Implement deleting a motorcycle
-    // 1. Use `supabase.from('motorcycles').delete().eq('id', bikeId)`
-    console.warn('deleteBike not implemented');
-    return Promise.resolve();
+    try {
+      const { error } = await supabase
+        .from('bikes') // Use 'bikes' table consistent with other methods
+        .delete()
+        .eq('id', bikeId);
+
+      if (error) {
+        console.error('Error deleting bike:', error);
+        throw error;
+      }
+      console.log(`Bike with ID ${bikeId} deleted successfully.`);
+    } catch (err) {
+      console.error('Unexpected error in deleteBike:', err);
+      throw err;
+    }
   }
 }

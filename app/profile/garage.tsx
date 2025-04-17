@@ -1,15 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Button, FlatList, ActivityIndicator, Alert, StyleSheet } from 'react-native'; // Or use Tamagui components
+import { Alert, ScrollView } from 'react-native'; // Keep Alert, add ScrollView
 import { useRouter, Link } from 'expo-router';
-import { ThemedView } from '@/components/ThemedView';
-import { ThemedText } from '@/components/ThemedText';
+import { YStack, XStack, Button, Spinner, Paragraph, H2, Separator, ListItem } from 'tamagui'; // Import Tamagui components
+import { ThemedView } from '@/components/ThemedView'; // Keep ThemedView for background
 import { Bike, BikeStatus, BikeType } from 'bikr-shared'; // Import Enums
 import { SupabaseProfileRepository } from '@/repositories/SupabaseProfileRepository'; // Import repository
 import { useAuth } from '@/hooks/useAuth'; // Needed if getGarage depends on user ID implicitly
 
-// TODO: Implement actual UI for bike list items (maybe a dedicated component)
-// TODO: Implement Add/Edit bike screens fully
-// TODO: Implement delete bike functionality
+// TODO: Implement Add/Edit bike screens fully (Edit partially done)
 
 const profileRepository = new SupabaseProfileRepository();
 
@@ -22,8 +20,6 @@ export default function GarageScreen() {
 
   useEffect(() => {
     const fetchGarage = async () => {
-      // Assuming getGarage implicitly uses the authenticated user or doesn't need ID
-      // If it needs ID, pass user.id
       if (!user) {
           setError("User not authenticated");
           setIsLoading(false);
@@ -32,7 +28,6 @@ export default function GarageScreen() {
       setIsLoading(true);
       setError(null);
       try {
-        // Call the actual repository method (currently returns empty array)
         const fetchedBikes = await profileRepository.getGarage();
         setBikes(fetchedBikes);
       } catch (err: any) {
@@ -47,104 +42,107 @@ export default function GarageScreen() {
     fetchGarage();
   }, [user]); // Refetch if user changes
 
-  const renderItem = ({ item }: { item: Bike }) => (
-      <View style={styles.bikeItem}>
-          <View>
-            <ThemedText style={styles.bikeName}>{item.name}</ThemedText>
-            <ThemedText style={styles.bikeDetails}>Type: {item.type} | Status: {item.status}</ThemedText>
-          </View>
-          {/* Use relative path for dynamic route */}
-          <Link href={`./edit-bike/${item.id}`} asChild>
-              <Button title="Edit" />
-          </Link>
-      </View>
-  );
+  const handleDeleteBike = async (bikeId: string) => {
+    Alert.alert(
+      "Confirm Deletion",
+      "Are you sure you want to delete this bike?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            // Show loading state specifically for delete? For now, just reuse main one.
+            // Consider adding a per-item loading state if needed.
+            setIsLoading(true);
+            try {
+              await profileRepository.deleteBike(bikeId);
+              setBikes((currentBikes) => currentBikes.filter((bike) => bike.id !== bikeId));
+              Alert.alert('Success', 'Bike deleted successfully.');
+            } catch (err: any) {
+              console.error("Failed to delete bike:", err);
+              Alert.alert('Error', err.message || 'Could not delete the bike.');
+            } finally {
+              setIsLoading(false);
+            }
+          },
+        },
+      ]
+    );
+  };
 
   const goToAddBike = () => {
-      // Use relative path
-      router.push('./add-bike');
+      router.push('./add-bike'); // Use relative path
   };
 
    const renderContent = () => {
     if (isLoading) {
-      return <ActivityIndicator size="large" style={{ marginTop: 30 }} />;
+      return <Spinner size="large" marginTop="$4" />;
     }
     if (error) {
-      return <ThemedText style={styles.errorText}>Error: {error}</ThemedText>;
+      return <Paragraph color="$red10" textAlign="center" marginTop="$4">Error: {error}</Paragraph>;
     }
+    if (bikes.length === 0) {
+        return <Paragraph textAlign="center" marginTop="$4" color="$gray10">No bikes added yet.</Paragraph>;
+    }
+
+    // Using ScrollView + map instead of FlatList for simplicity with Tamagui
     return (
-       <FlatList
-          data={bikes}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id}
-          ListEmptyComponent={<ThemedText style={styles.emptyText}>No bikes added yet.</ThemedText>}
-          contentContainerStyle={{ flexGrow: 1 }} // Ensure empty text shows correctly
-      />
+       <YStack space="$2" marginTop="$3">
+          {bikes.map((item, index) => (
+            <React.Fragment key={item.id}>
+                <XStack
+                    paddingVertical="$3"
+                    paddingHorizontal="$2"
+                    alignItems="center"
+                    justifyContent="space-between"
+                >
+                    <YStack flex={1} marginRight="$2">
+                        <Paragraph fontWeight="bold" fontSize="$5">{item.name}</Paragraph>
+                        <Paragraph size="$2" color="$gray10">
+                            Type: {item.type} | Status: {item.status}
+                        </Paragraph>
+                    </YStack>
+                    <XStack space="$2">
+                        <Link href={`./edit-bike/${item.id}`} asChild>
+                            <Button size="$2" theme="alt1">Edit</Button>
+                        </Link>
+                        <Button
+                            size="$2"
+                            theme="red_active" // Use a red theme for delete
+                            onPress={() => handleDeleteBike(item.id)}
+                            disabled={isLoading} // Disable while any loading is happening
+                        >
+                            Delete
+                        </Button>
+                    </XStack>
+                </XStack>
+                {index < bikes.length - 1 && <Separator />}
+            </React.Fragment>
+          ))}
+       </YStack>
     );
    };
 
   return (
-    <ThemedView style={styles.container}>
-      <View style={styles.header}>
-          <ThemedText type="title">My Garage</ThemedText>
-          <Button title="Add Bike" onPress={goToAddBike} />
-      </View>
+    <ThemedView style={{ flex: 1 }}>
+        <ScrollView>
+            <YStack flex={1} padding="$4" space="$4">
+                <XStack justifyContent="space-between" alignItems="center">
+                    <H2>My Garage</H2>
+                    <Button onPress={goToAddBike} theme="active">Add Bike</Button>
+                </XStack>
 
-      {renderContent()}
+                {renderContent()}
 
-       {/* Back button */}
-       <View style={styles.footer}>
-            {/* Use relative path */}
-           <Button title="Back to Profile" onPress={() => router.replace('./')} />
-       </View>
+                {/* Back button */}
+                <YStack marginTop="$4">
+                    <Button onPress={() => router.replace('./')} theme="alt1">Back to Profile</Button>
+                </YStack>
+            </YStack>
+        </ScrollView>
     </ThemedView>
   );
 }
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        padding: 15,
-    },
-    header: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: 15,
-        paddingHorizontal: 5, // Add some padding
-    },
-    footer: {
-        marginTop: 20,
-        paddingHorizontal: 5,
-    },
-    bikeItem: {
-        paddingVertical: 12,
-        paddingHorizontal: 10,
-        borderBottomWidth: 1,
-        borderColor: '#eee', // Use theme color later
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-    },
-    bikeName: {
-        fontSize: 16,
-        fontWeight: 'bold',
-    },
-    bikeDetails: {
-        fontSize: 13,
-        color: 'grey', // Use theme color later
-        marginTop: 2,
-    },
-    emptyText: {
-        textAlign: 'center',
-        marginTop: 50,
-        fontSize: 16,
-        color: 'grey',
-    },
-    errorText: {
-        textAlign: 'center',
-        marginTop: 50,
-        fontSize: 16,
-        color: 'red',
-    }
-});
+// StyleSheet removed - styling done inline with Tamagui props

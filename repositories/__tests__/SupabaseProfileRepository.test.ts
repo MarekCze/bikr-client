@@ -282,8 +282,31 @@ describe('SupabaseProfileRepository', () => {
     it.todo('should implement tests for updating a bike');
   });
 
+  // --- deleteBike Tests ---
   describe('deleteBike', () => {
-    it.todo('should implement tests for deleting a bike');
+    const mockBikeId = 'bike-to-delete-id';
+
+    it('should call Supabase delete with the correct parameters on successful deletion', async () => {
+      // Mock successful deletion (no error)
+      mockSupabaseQueryBuilder.eq.mockResolvedValueOnce({ error: null }); // eq() is the final step in the delete chain here
+
+      await repository.deleteBike(mockBikeId);
+
+      expect(supabase.from).toHaveBeenCalledWith('bikes');
+      expect(mockSupabaseQueryBuilder.delete).toHaveBeenCalledTimes(1);
+      expect(mockSupabaseQueryBuilder.eq).toHaveBeenCalledWith('id', mockBikeId);
+    });
+
+    it('should throw an error if Supabase delete fails', async () => {
+      const deleteError = new Error('Supabase delete failed');
+      // Mock failed deletion
+      mockSupabaseQueryBuilder.eq.mockResolvedValueOnce({ error: deleteError });
+
+      await expect(repository.deleteBike(mockBikeId)).rejects.toThrow(deleteError);
+
+      expect(supabase.from).toHaveBeenCalledWith('bikes');
+      expect(mockSupabaseQueryBuilder.delete).toHaveBeenCalledTimes(1);
+      expect(mockSupabaseQueryBuilder.eq).toHaveBeenCalledWith('id', mockBikeId);
+    });
   });
 });
-// REMOVE DUPLICATED CODE BLOCK BELOW THIS LINE
