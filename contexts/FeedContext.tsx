@@ -2,8 +2,13 @@ import React, { createContext, useContext, useState, useCallback, useEffect, Rea
 import { Alert } from 'react-native';
 import * as Location from 'expo-location';
 import { useAuth } from '../hooks/useAuth';
-import { apiClient } from '../services/api';
+// import { apiClient } from '../services/api'; // Remove apiClient import
+import { SupabaseFeedRepository } from '../repositories/SupabaseFeedRepository'; // Import repository
+import { FetchFeedParams } from '../repositories/IFeedRepository'; // Import params type
 import { feedCache, FeedResult, Post } from '../utils/feedCache';
+
+// Instantiate repository (replace with DI or context later)
+const feedRepository = new SupabaseFeedRepository();
 
 // Define the state for the feed context
 interface FeedContextState {
@@ -134,10 +139,14 @@ export const FeedProvider: React.FC<FeedProviderProps> = ({ children }) => {
         feedData = feedCache.getFeed('user', options);
       }
       
-      // If no cached data, fetch from API
+      // If no cached data, fetch from Repository
       if (!feedData) {
-        feedData = await apiClient.feeds.getUserFeed(token, options);
-        
+        const fetchParams: FetchFeedParams = {
+          ...options,
+          userId: session?.user?.id, // Pass user ID from session
+        };
+        feedData = await feedRepository.getUserFeed(fetchParams);
+
         // Cache the result
         if (feedData) {
           feedCache.storeFeed('user', feedData, options);
@@ -195,10 +204,11 @@ export const FeedProvider: React.FC<FeedProviderProps> = ({ children }) => {
         feedData = feedCache.getFeed('popular', options);
       }
       
-      // If no cached data, fetch from API
+      // If no cached data, fetch from Repository
       if (!feedData) {
-        feedData = await apiClient.feeds.getPopularFeed(token, options);
-        
+        const fetchParams: FetchFeedParams = options; // Popular feed doesn't need extra params here
+        feedData = await feedRepository.getPopularFeed(fetchParams);
+
         // Cache the result
         if (feedData) {
           feedCache.storeFeed('popular', feedData, options);
@@ -287,15 +297,16 @@ export const FeedProvider: React.FC<FeedProviderProps> = ({ children }) => {
         feedData = feedCache.getFeed('local', cacheParams);
       }
       
-      // If no cached data, fetch from API
+      // If no cached data, fetch from Repository
       if (!feedData) {
-        feedData = await apiClient.feeds.getLocalFeed(
-          location!,
-          localFeed.radius,
-          token,
-          options
-        );
-        
+        const fetchParams: FetchFeedParams = {
+          ...options,
+          latitude: location?.latitude,
+          longitude: location?.longitude,
+          radius: localFeed.radius,
+        };
+        feedData = await feedRepository.getLocalFeed(fetchParams);
+
         // Cache the result
         if (feedData) {
           feedCache.storeFeed('local', feedData, cacheParams);
@@ -360,15 +371,19 @@ export const FeedProvider: React.FC<FeedProviderProps> = ({ children }) => {
         feedData = feedCache.getFeed('filtered', cacheParams);
       }
       
-      // If no cached data, fetch from API
+      // If no cached data, fetch from Repository
       if (!feedData) {
-        feedData = await apiClient.feeds.getFilteredFeed(
-          filterType,
-          filterId,
-          token,
-          options
-        );
-        
+         // Prepare params based on filterType - this might need refinement
+         // depending on how filterId maps to FetchFeedParams
+        const fetchParams: FetchFeedParams = {
+          ...options,
+          // Example: Assuming filterId is used directly as a filter term
+          // Adjust this logic based on actual backend expectations
+          filter: filterId,
+          // Potentially add specific params like clubId, eventId based on filterType
+        };
+        feedData = await feedRepository.getFilteredFeed(fetchParams);
+
         // Cache the result
         if (feedData) {
           feedCache.storeFeed('filtered', feedData, cacheParams);

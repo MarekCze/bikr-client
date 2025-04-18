@@ -21,17 +21,22 @@
    - [x] Google OAuth integration (100%)
    - [x] Email/Password authentication integration (UI + API calls) (100%)
    - [ ] Additional OAuth providers (0% - On Hold)
-3. Phase 2.1: Content Domain API Integration (Client-Side) (80%)
+3. Phase 2.1: Content Domain API Integration (Client-Side) (90%)
    - [x] Utilize Post domain models from `bikr-shared`
    - [x] Utilize Zod validation schemas from `bikr-shared`
-   - [x] Integrate with `POST /posts` endpoint (UI + API call)
-   - [x] Integrate with `GET /posts/:postId` endpoint (API call)
-   - [x] Integrate with `PUT /posts/:postId` endpoint (UI + API call)
-   - [x] Integrate with `DELETE /posts/:postId` endpoint (API call)
+   - [x] Define `IContentRepository` interface (`bikr-client/repositories/IContentRepository.ts`)
+   - [x] Implement `SupabaseContentRepository` (`bikr-client/repositories/SupabaseContentRepository.ts`)
+   - [x] Implement Content Creation Screen (`bikr-client/app/(tabs)/create.tsx`)
+   - [x] Integrate `expo-image-picker` for media selection in creation screen
+   - [x] Integrate `SupabaseContentRepository` into creation screen (`handleSubmit`)
+   - [x] Integrate with `POST /posts` endpoint (via Repository)
+   - [x] Integrate with `GET /posts/:postId` endpoint (via Repository)
+   - [x] Integrate with `PUT /posts/:postId` endpoint (via Repository)
+   - [x] Integrate with `DELETE /posts/:postId` endpoint (via Repository)
    - [x] Integrate with Like endpoints (`POST`, `DELETE`, `GET /posts/:postId/like`) (UI + API calls)
    - [ ] Integrate with Comment endpoints (API calls) (0%)
    - [ ] Integrate with Bookmark endpoints (API calls) (0%)
-   - [x] Implement media upload logic (client-side to storage/API)
+   - [x] Implement media upload logic (client-side to storage/API via Repository)
 4. Phase 2.2: MediaCard Component System (Client-Side) (100%)
    - [x] Core MediaCard Components
      - [x] Create base MediaCard component (`bikr-client/components/content/MediaCard/MediaCard.tsx`)
@@ -59,19 +64,21 @@
      - [x] Add test structure (`bikr-client/components/content/__tests__/MediaCard.test.tsx`)
      - [x] Create examples (`bikr-client/components/content/examples/MediaCardExamples.tsx`)
      - [x] Implement feed example (`bikr-client/components/content/examples/FeedExample.tsx`)
-5. Phase 2.3: Feed System (Client-Side) (90%)
+5. Phase 2.3: Feed System (Client-Side) (95%)
    - [x] Feed Data Management Layer (Client)
-     - [x] Define client-side feed repository interface
+     - [x] Define client-side feed repository interface (`bikr-client/repositories/IFeedRepository.ts`)
+     - [x] Implement client-side feed repository (`bikr-client/repositories/SupabaseFeedRepository.ts`)
+     - [x] Integrate `SupabaseFeedRepository` into `FeedContext` (`bikr-client/contexts/FeedContext.tsx`)
      - [x] Utilize feed types from `bikr-shared`
-     - [x] Implement client-side feed repository methods (calling API)
      - [x] Implement client-side caching strategy (`bikr-client/utils/feedCache.ts`)
+     - [x] Install `expo-location` dependency for local feed
    - [x] Feed UI Components
      - [x] Create BaseFeedPage component (`bikr-client/components/feed/BaseFeedPage.tsx`)
      - [x] Implement infinite scroll functionality
      - [x] Create feed filter components
      - [x] Add pull-to-refresh functionality
    - [x] API Integration
-     - [x] Add feed methods to API client (`bikr-client/services/api.ts`)
+     - [x] Integrate Feed Repository into `FeedContext`
      - [x] Implement feed screen logic (`bikr-client/app/(tabs)/index.tsx`, etc.)
    - [x] Feed Types Implementation (Client UI)
      - [x] Create UserFeed implementation
