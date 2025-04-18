@@ -8,6 +8,7 @@
 - [x] Session persistence with MMKV storage (`bikr-client/hooks/useAuth.ts`)
 - [x] Usage of shared types/schemas from `bikr-shared`
 - [x] Phase 1 Profile & Onboarding Features (Repository, Screens, Tamagui Refactor)
+- [x] Phase 3.2: Following & Connections (Initial Implementation - Repositories, Search, Lists, Profile Links)
 
 ## Current Focus Areas
 1. Debugging and Fixing Critical Issues
@@ -92,12 +93,9 @@
       - [ ] Create filtered feed implementations (UI integration pending)
 
  ## Next Steps (Client Focus)
- - Continue Phase 3: Social Interaction Features (Client-Side)
-   - Develop Follow/Connection system (Client-Side) [NEXT FOCUS]
-     - Implement UI for user discovery (search, recommendations)
-     - Implement UI for following/followers lists
-    - Integrate follow/unfollow actions with API
-  - Implement Content Sharing features (Client-Side)
+ - Refine Phase 3.2: Following & Connections
+   - Address TODOs (initial follow status, pagination, TS errors).
+ - Implement Phase 3.3: Content Sharing features (Client-Side) [NEXT FOCUS]
     - Build share UI components/interactions
     - Integrate with native sharing APIs
 - Complete remaining Content Domain API integrations (Comments, Bookmarks)

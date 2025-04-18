@@ -1,18 +1,21 @@
-## Current Focus: Phase 1 Completion - User Profile & Onboarding (Completed)
+## Current Focus: Phase 3.2 - Following & Connections (Initial Implementation Complete)
 
-We have completed the implementation of the Phase 1 User Profile and Onboarding features as outlined in `bikr-client/memory-bank/features/phase1-completion-profile-onboarding.md`.
-
-**Summary of Work Done:**
-- Implemented all required methods in `SupabaseProfileRepository`, including `deleteBike`, and updated method signatures (`updateBike`). Added corresponding unit tests.
-- Added `interests` and `experienceLevel` fields to the shared `User` type.
-- Implemented the full onboarding flow (`welcome`, `interests`, `experience`, `bike-setup`, `permissions`) using Tamagui components, including data saving and permission requests.
-- Refactored all profile management screens (`index`, `edit`, `garage`, `add-bike`, `edit-bike`, `settings`) using Tamagui components, integrating repository methods and adding basic loading/error handling.
-- Resolved various TypeScript and configuration issues encountered during implementation (e.g., missing packages, incorrect paths, component prop usage).
+**Summary of Work Done (Phase 3.2):**
+- Defined shared types for pagination (`PaginatedUsersResponse` in `bikr-shared`).
+- Created `ISocialRepository` interface and `SupabaseSocialRepository` implementation (`bikr-client/repositories/`).
+- Created reusable `UserListItem` component (`bikr-client/components/profile/`).
+- Created `useDebounce` hook (`bikr-client/hooks/`).
+- Implemented user search functionality within the Explore tab (`bikr-client/app/(tabs)/explore.tsx`).
+- Created dedicated screens for Followers and Following lists (`bikr-client/app/profile/followers.tsx`, `bikr-client/app/profile/following.tsx`).
+- Updated the main Profile screen (`bikr-client/app/profile/index.tsx`) to display follower/following counts and link to the new list screens.
 
 **Status:**
-The core functionality for Phase 1 Profile & Onboarding is complete and integrated. The UI has been refactored using Tamagui.
+The initial client-side implementation for Phase 3.2 Following & Connections is complete. Core components, repositories, and screens are in place.
 
 **Next Steps:**
-- Proceed with the next phase outlined in the development plan (likely Phase 3: Social Interaction Features, starting with the Comment System).
-- Address any remaining minor TODOs or potential refinements noted in the code (e.g., advanced validation, specific UI tweaks, `uploadAvatar` file conversion).
-- Review and test the completed features thoroughly.
+- Refine Phase 3.2 implementation:
+    - Address TODOs noted in the code (fetching initial follow status for lists/search, implementing pagination/infinite scroll).
+    - Resolve the minor TypeScript error related to `useDebounce` import in `explore.tsx`.
+    - Enhance error handling.
+- Proceed with Phase 3.3: Content Sharing (Client-Side).
+- Review and test the implemented Phase 3.2 features thoroughly.

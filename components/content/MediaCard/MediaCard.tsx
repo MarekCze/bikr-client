@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { Alert } from 'react-native'; // Import Alert from react-native
 import { Stack, YStack, Spinner, Paragraph } from 'tamagui';
+import * as Sharing from 'expo-sharing'; // Import expo-sharing
 import { MediaCardProps } from './MediaCardTypes';
 import { Comment, CreateCommentInput } from '../../../../bikr-shared/src/types/post'; // Corrected path and added CreateCommentInput
 import { SupabaseContentRepository } from '@/repositories/SupabaseContentRepository';
@@ -107,6 +108,28 @@ export default function MediaCard({
     Alert.alert("Edit", `Editing comment: ${comment.content}`);
   };
 
+  // Handler for pressing the share button
+  const handleSharePress = async () => {
+    // TODO: Replace with actual deep link once post screen is created
+    const shareUrl = `https://bikr.app/post/${post.id}`; // Placeholder URL
+    const shareMessage = `Check out this post on Bikr: ${post.content?.substring(0, 50) || ''}...`; // Placeholder message
+
+    try {
+      if (!(await Sharing.isAvailableAsync())) {
+        Alert.alert("Sharing not available", "Sharing is not available on this device.");
+        return;
+      }
+      await Sharing.shareAsync(shareUrl, {
+        dialogTitle: 'Share this post', // iOS only
+        mimeType: 'text/plain', // Optional: Specify mime type
+        // UTI: 'public.url', // Optional: iOS Uniform Type Identifier
+      });
+      // You could add tracking here if needed
+    } catch (error: any) {
+      console.error("Error sharing post:", error);
+      Alert.alert("Error", `Could not share post: ${error.message}`);
+    }
+  };
 
   // Helper function to determine the content based on post type
   const renderContent = () => {
@@ -182,8 +205,9 @@ export default function MediaCard({
             isLiked={post.user_interaction?.is_liked || false}
             isBookmarked={post.user_interaction?.is_bookmarked || false}
             isEvent={post.context_type === 'Event'} // Use snake_case from DB/RPC
-            // Pass the handler
+            // Pass the handlers
             onCommentPress={handleCommentPress}
+            onSharePress={handleSharePress} // Pass share handler
             // TODO: Pass other handlers (onLikePress, onBookmarkPress etc.) if needed
           />
         )}
