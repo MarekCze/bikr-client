@@ -1,73 +1,83 @@
 import React, { useState } from 'react';
-import { Alert } from 'react-native';
-import { Input, Button, XStack, Spinner } from 'tamagui';
-import { SupabaseContentRepository } from '@/repositories/SupabaseContentRepository';
-import { useAuth } from '@/hooks/useAuth';
-import { CreateCommentInput } from 'bikr-shared/types/post'; // Use path alias
-
-// Instantiate repository (replace with DI or context later)
-const contentRepository = new SupabaseContentRepository();
+import { View, TextInput, Button, StyleSheet, Alert } from 'react-native';
+import { ThemedView } from '@/components/ThemedView';
+import { ThemedText } from '@/components/ThemedText';
 
 interface CommentInputProps {
-  postId: string;
-  onCommentAdded?: () => void; // Optional callback after successful post
+  postId: string; // The ID of the post being commented on
+  parentId?: string; // Optional: The ID of the parent comment if this is a reply
+  onSubmit: (commentText: string) => Promise<void>; // Function to call when submitting
+  placeholder?: string;
 }
 
-export default function CommentInput({ postId, onCommentAdded }: CommentInputProps) {
+export const CommentInput: React.FC<CommentInputProps> = ({
+  postId,
+  parentId,
+  onSubmit,
+  placeholder = "Add a comment...",
+}) => {
   const [commentText, setCommentText] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { session } = useAuth(); // Get the full session which includes the token
 
   const handleSubmit = async () => {
     if (!commentText.trim()) {
-      Alert.alert('Error', 'Comment cannot be empty.');
-      return;
-    }
-
-    if (!session?.session?.access_token) {
-      Alert.alert('Error', 'You must be logged in to comment.');
+      Alert.alert("Error", "Comment cannot be empty.");
       return;
     }
 
     setIsSubmitting(true);
     try {
-      const input: CreateCommentInput = {
-        content: commentText,
-        // parent_comment_id can be added later for replies
-      };
-      
-      // Pass postId, input, and the access token
-      await contentRepository.createComment(postId, input, session.session.access_token);
-
-      setCommentText(''); // Clear input on success
-      Alert.alert('Success', 'Comment posted!');
-      onCommentAdded?.(); // Call the callback if provided
-
-    } catch (error: any) {
-      console.error('Failed to post comment:', error);
-      Alert.alert('Error', error.message || 'Failed to post comment.');
+      await onSubmit(commentText);
+      setCommentText(''); // Clear input on successful submission
+    } catch (error) {
+      console.error("Failed to submit comment:", error);
+      Alert.alert("Error", "Could not submit comment. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <XStack space="$2" alignItems="center" padding="$2">
-      <Input
-        flex={1}
-        placeholder="Add a comment..."
+    <ThemedView style={styles.container}>
+      <TextInput
+        style={styles.input}
+        placeholder={placeholder}
         value={commentText}
         onChangeText={setCommentText}
-        disabled={isSubmitting}
+        multiline
+        // Add theme-aware styling if needed
+        placeholderTextColor="#999" // Example placeholder color
       />
-      <Button 
-        theme="active" 
-        onPress={handleSubmit} 
+      <Button
+        title={isSubmitting ? "Submitting..." : "Submit"}
+        onPress={handleSubmit}
         disabled={isSubmitting || !commentText.trim()}
-        icon={isSubmitting ? <Spinner size="small" /> : undefined}
-      >
-        {isSubmitting ? '' : 'Post'}
-      </Button>
-    </XStack>
+      />
+    </ThemedView>
   );
-}
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 10,
+    borderTopWidth: 1,
+    borderTopColor: '#eee', // Example border color
+    // Add theme-aware background color if needed
+  },
+  input: {
+    flex: 1,
+    borderColor: '#ccc', // Example border color
+    borderWidth: 1,
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    marginRight: 10,
+    maxHeight: 100, // Limit height for multiline
+    // Add theme-aware text color, background color, border color
+  },
+});
+
+// Export the component for use
+export default CommentInput;

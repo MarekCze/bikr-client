@@ -1,9 +1,11 @@
-import React, { useState, useCallback } from 'react'; // Add useState, useCallback
-import { Stack, YStack, Spinner, Paragraph } from 'tamagui'; // Add Spinner, Paragraph
+import React, { useState, useCallback } from 'react';
+import { Alert } from 'react-native'; // Import Alert from react-native
+import { Stack, YStack, Spinner, Paragraph } from 'tamagui';
 import { MediaCardProps } from './MediaCardTypes';
-import { Comment } from 'bikr-shared/types/post'; // Import Comment type
-import { SupabaseContentRepository } from '@/repositories/SupabaseContentRepository'; // Import repository
-import { useAuth } from '@/hooks/useAuth'; // Import auth hook
+import { Comment, CreateCommentInput } from '../../../../bikr-shared/src/types/post'; // Corrected path and added CreateCommentInput
+import { SupabaseContentRepository } from '@/repositories/SupabaseContentRepository';
+import { IContentRepository } from '@/repositories/IContentRepository'; // Import interface
+import { useAuth } from '@/hooks/useAuth';
 import TextPostCard from './TextPostCard';
 import ImageGalleryCard from './ImageGalleryCard';
 import VideoPlayerCard from './VideoPlayerCard';
@@ -25,10 +27,12 @@ export default function MediaCard({
   const [comments, setComments] = useState<Comment[]>([]);
   const [isLoadingComments, setIsLoadingComments] = useState(false);
   const [commentError, setCommentError] = useState<string | null>(null);
-  const { session } = useAuth(); // Get auth session for token
+  const { session } = useAuth();
+  const token = session?.session?.access_token;
 
   // Instantiate repository (consider moving to context/DI later)
-  const contentRepository = new SupabaseContentRepository();
+  // Use interface type for better practice
+  const contentRepository: IContentRepository = new SupabaseContentRepository();
 
   // Function to fetch comments
   const fetchComments = useCallback(async () => {
@@ -37,21 +41,20 @@ export default function MediaCard({
     setIsLoadingComments(true);
     setCommentError(null);
     try {
-      // Pass token if available (optional for GET comments based on server route)
+      // Repo method doesn't take token
       const fetchedComments = await contentRepository.getCommentsByPostId(
-        post.id, 
+        post.id,
         undefined, // limit
-        undefined, // offset 
-        session?.session?.access_token // Pass token
+        undefined // offset
       );
-      setComments(fetchedComments || []); // Ensure it's an array
+      setComments(fetchedComments || []);
     } catch (err: any) {
       console.error("Error fetching comments:", err);
       setCommentError(err.message || 'Failed to load comments.');
     } finally {
       setIsLoadingComments(false);
     }
-  }, [post.id, session?.session?.access_token]); // Dependencies
+  }, [post.id, contentRepository]); // Removed token dependency
 
   // Handler for pressing the comment button
   const handleCommentPress = () => {
@@ -62,6 +65,48 @@ export default function MediaCard({
       fetchComments();
     }
   };
+
+  // Handler for submitting a new comment
+  const handleCommentSubmit = async (commentText: string) => {
+    if (!token) {
+      Alert.alert("Error", "You must be logged in to comment.");
+      throw new Error("User not authenticated"); // Throw error to stop CommentInput processing
+    }
+    if (!post.id) {
+      Alert.alert("Error", "Cannot determine which post to comment on.");
+      throw new Error("Post ID is missing");
+    }
+
+    const commentInput: CreateCommentInput = {
+      content: commentText,
+      // parentId: null, // Add logic for replies later
+    };
+
+    try {
+      // Pass token as required by interface
+      await contentRepository.createComment(post.id, commentInput, token);
+      // Refresh comments after successful submission
+      fetchComments();
+    } catch (error: any) {
+      console.error("Failed to submit comment:", error);
+      Alert.alert("Error", `Failed to submit comment: ${error.message}`);
+      throw error; // Re-throw to let CommentInput know submission failed
+    }
+  };
+
+  // Placeholder handlers for reply/edit actions
+  const handleStartReply = (comment: Comment) => {
+    console.log("Replying to comment:", comment.id);
+    // TODO: Implement reply UI logic (e.g., focus input, set parentId state)
+    Alert.alert("Reply", `Replying to comment by ${comment.author?.displayName || 'user'}`);
+  };
+
+  const handleStartEdit = (comment: Comment) => {
+    console.log("Editing comment:", comment.id);
+    // TODO: Implement edit UI logic (e.g., show edit input with comment content)
+    Alert.alert("Edit", `Editing comment: ${comment.content}`);
+  };
+
 
   // Helper function to determine the content based on post type
   const renderContent = () => {
@@ -130,28 +175,37 @@ export default function MediaCard({
         {showEngagementRibbon && (
           <EngagementRibbon
             postId={post.id}
-            // Use camelCase props based on likely type definition
-            likeCount={post.likeCount} 
-            commentCount={post.commentCount} 
-            bookmarkCount={post.bookmarkCount} 
-            isLiked={post.userInteraction?.isLiked || false} 
-            isBookmarked={post.userInteraction?.isBookmarked || false} 
-            isEvent={post.contextType === 'Event'}
+            // Use correct camelCase props from DetailedPost type
+            likeCount={post.like_count || 0}
+            commentCount={post.comment_count || 0}
+            bookmarkCount={post.bookmark_count || 0} // Assuming bookmark_count exists
+            isLiked={post.user_interaction?.is_liked || false}
+            isBookmarked={post.user_interaction?.is_bookmarked || false}
+            isEvent={post.context_type === 'Event'} // Use snake_case from DB/RPC
             // Pass the handler
-            onCommentPress={handleCommentPress} 
+            onCommentPress={handleCommentPress}
+            // TODO: Pass other handlers (onLikePress, onBookmarkPress etc.) if needed
           />
         )}
 
         {/* Conditionally render comments section */}
         {showComments && (
           <YStack marginTop="$3" space="$2">
-            {isLoadingComments && <Spinner />}
+            {isLoadingComments && <Spinner size="large" />}
             {commentError && <Paragraph color="$red10">{commentError}</Paragraph>}
             {!isLoadingComments && !commentError && (
-              <>
-                <CommentInput postId={post.id} onCommentAdded={fetchComments} />
-                <CommentList comments={comments} />
-              </>
+              <YStack space="$3">
+                {/* Pass onSubmit handler */}
+                <CommentInput postId={post.id} onSubmit={handleCommentSubmit} />
+                {/* Pass required props */}
+                <CommentList
+                  postId={post.id}
+                  contentRepository={contentRepository}
+                  onStartReply={handleStartReply}
+                  onStartEdit={handleStartEdit}
+                  // Note: CommentList fetches its own comments internally now
+                />
+              </YStack>
             )}
           </YStack>
         )}

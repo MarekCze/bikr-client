@@ -8,29 +8,29 @@ This phase focuses on enabling users to interact with content and each other.
 
 **Tasks:**
 
-1.  **Client Repository Integration (`SupabaseContentRepository.ts`):**
-    *   [ ] Implement `createComment` method (calling `POST /posts/:postId/comments`).
-    *   [ ] Implement `getCommentsByPostId` method (calling `GET /posts/:postId/comments`).
-    *   [ ] Implement `updateComment` method (calling `PUT /comments/:commentId`).
-    *   [ ] Implement `deleteComment` method (calling `DELETE /comments/:commentId`).
-    *   [ ] Implement `likeComment` method (calling `POST /comments/:commentId/like`).
-    *   [ ] Implement `unlikeComment` method (calling `DELETE /comments/:commentId/like`).
-    *   [ ] Implement `getCommentLikes` method (calling `GET /comments/:commentId/likes` - *Note: Server endpoint might be missing, needs verification*).
+ 1.  **Client Repository Integration (`SupabaseContentRepository.ts`):**
+    *   [x] Implement `createComment` method (calling `POST /posts/:postId/comments`).
+    *   [x] Implement `getCommentsByPostId` method (calling `GET /posts/:postId/comments`).
+    *   [x] Implement `updateComment` method (calling `PUT /comments/:commentId`).
+    *   [x] Implement `deleteComment` method (calling `DELETE /comments/:commentId`).
+    *   [x] Implement `likeComment` method (calling `POST /comments/:commentId/like`).
+    *   [x] Implement `unlikeComment` method (calling `DELETE /comments/:commentId/like`).
+    *   [x] Implement `getCommentLikes` method (calling `GET /comments/:commentId/likes`).
 
-2.  **Comment UI Components (`bikr-client/components/content/Comment/`):**
-    *   [ ] Create `CommentInput.tsx` component for adding new comments/replies.
-    *   [ ] Create `CommentItem.tsx` component to display a single comment (including author, content, timestamp, like count).
-    *   [ ] Create `CommentList.tsx` component to display a list of comments, potentially handling threading/replies.
-    *   [ ] Implement UI for liking/unliking comments within `CommentItem.tsx`.
-    *   [ ] Implement UI for editing/deleting own comments (conditional rendering).
-    *   [ ] Integrate comment count display in `EngagementRibbon.tsx` (Phase 2 component).
-    *   [ ] Implement UI to trigger loading/displaying comments (e.g., in a modal or below the post).
+ 2.  **Comment UI Components (`bikr-client/components/content/Comment/`):**
+    *   [x] Create `CommentInput.tsx` component for adding new comments/replies.
+    *   [x] Create `CommentItem.tsx` component to display a single comment (including author, content, timestamp, like count).
+    *   [x] Create `CommentList.tsx` component to display a list of comments, potentially handling threading/replies.
+    *   [x] Implement UI for liking/unliking comments within `CommentItem.tsx`.
+    *   [x] Implement UI for editing/deleting own comments (conditional rendering).
+    *   [x] Integrate comment count display in `EngagementRibbon.tsx` (Phase 2 component).
+    *   [x] Implement UI to trigger loading/displaying comments (e.g., in `MediaCard.tsx`).
 
-3.  **Integration:**
-    *   [ ] Connect `CommentInput.tsx` to the `createComment` repository method.
-    *   [ ] Connect `CommentList.tsx` to the `getCommentsByPostId` repository method.
-    *   [ ] Connect like/unlike UI actions to the respective repository methods.
-    *   [ ] Connect edit/delete UI actions to the respective repository methods.
+ 3.  **Integration:**
+    *   [x] Connect `CommentInput.tsx` to the `createComment` repository method (in `MediaCard.tsx`).
+    *   [x] Connect `CommentList.tsx` to the `getCommentsByPostId` repository method (internally in `CommentList.tsx`).
+    *   [x] Connect like/unlike UI actions to the respective repository methods (in `CommentList.tsx`).
+    *   [x] Connect edit/delete UI actions to the respective repository methods (in `CommentList.tsx`).
 
 ## 3.2 Following & Connections
 

@@ -187,15 +187,15 @@ export class SupabaseContentRepository implements IContentRepository {
   }
 
   async getCommentLikes(commentId: string, limit?: number, offset?: number, token?: string): Promise<Like[]> {
-     try {
-      // TODO: apiClient.content.getCommentLikes needs to be implemented in api.ts
-      // Placeholder implementation - assuming it exists
-      // return await apiClient.content.getCommentLikes(commentId, token, limit, offset);
-      console.warn('apiClient.content.getCommentLikes not implemented yet in api.ts');
-      throw new Error('Get comment likes functionality via API client is not implemented.');
+    try {
+      // Assuming apiClient.content.getCommentLikes exists and returns Like[]
+      // Note: The actual implementation in api.ts might need verification/creation
+      const likesData = await apiClient.content.getCommentLikes(commentId, token, limit, offset);
+      // Basic type assertion, consider more robust validation/mapping if api returns 'any'
+      return likesData as Like[];
     } catch (error) {
       handleApiError(error, `get likes for comment ${commentId}`);
-      throw error;
+      throw error; // Re-throw after logging
     }
   }
 

@@ -31,13 +31,13 @@
    - [x] Integrate `SupabaseContentRepository` into creation screen (`handleSubmit`)
    - [x] Integrate with `POST /posts` endpoint (via Repository)
    - [x] Integrate with `GET /posts/:postId` endpoint (via Repository)
-   - [x] Integrate with `PUT /posts/:postId` endpoint (via Repository)
-   - [x] Integrate with `DELETE /posts/:postId` endpoint (via Repository)
-   - [x] Integrate with Like endpoints (`POST`, `DELETE`, `GET /posts/:postId/like`) (UI + API calls)
-   - [ ] Integrate with Comment endpoints (API calls) (0%)
-   - [ ] Integrate with Bookmark endpoints (API calls) (0%)
-   - [x] Implement media upload logic (client-side to storage/API via Repository)
-4. Phase 2.2: MediaCard Component System (Client-Side) (100%)
+    - [x] Integrate with `PUT /posts/:postId` endpoint (via Repository)
+    - [x] Integrate with `DELETE /posts/:postId` endpoint (via Repository)
+    - [x] Integrate with Like endpoints (`POST`, `DELETE`, `GET /posts/:postId/like`) (UI + API calls)
+    - [x] Integrate with Comment endpoints (API calls) (100%)
+    - [ ] Integrate with Bookmark endpoints (API calls) (0%)
+    - [x] Implement media upload logic (client-side to storage/API via Repository)
+ 4. Phase 2.2: MediaCard Component System (Client-Side) (100%)
    - [x] Core MediaCard Components
      - [x] Create base MediaCard component (`bikr-client/components/content/MediaCard/MediaCard.tsx`)
      - [x] Implement text post rendering (`bikr-client/components/content/MediaCard/TextPostCard.tsx`)
@@ -63,9 +63,14 @@
      - [x] Create component exports (`bikr-client/components/content/MediaCard/index.tsx`)
      - [x] Add test structure (`bikr-client/components/content/__tests__/MediaCard.test.tsx`)
      - [x] Create examples (`bikr-client/components/content/examples/MediaCardExamples.tsx`)
-     - [x] Implement feed example (`bikr-client/components/content/examples/FeedExample.tsx`)
-5. Phase 2.3: Feed System (Client-Side) (95%)
-   - [x] Feed Data Management Layer (Client)
+      - [x] Implement feed example (`bikr-client/components/content/examples/FeedExample.tsx`)
+ 5. Phase 2.3: Feed System (Client-Side) (95%)
+    - [x] Feed Data Management Layer (Client)
+ 6. Phase 3.1: Comment System (Client-Side) (100%)
+    - [x] Implement Comment UI Components (`CommentInput`, `CommentItem`, `CommentList`)
+    - [x] Integrate Comment UI with Repository/API (Create, Read, Update, Delete, Like/Unlike)
+    - [x] Integrate Comment Count display in `EngagementRibbon`
+    - [x] Integrate Comment display toggle in `MediaCard`
      - [x] Define client-side feed repository interface (`bikr-client/repositories/IFeedRepository.ts`)
      - [x] Implement client-side feed repository (`bikr-client/repositories/SupabaseFeedRepository.ts`)
      - [x] Integrate `SupabaseFeedRepository` into `FeedContext` (`bikr-client/contexts/FeedContext.tsx`)
@@ -84,16 +89,13 @@
      - [x] Create UserFeed implementation
      - [x] Create PopularFeed implementation
      - [x] Create LocalFeed implementation
-     - [ ] Create filtered feed implementations (UI integration pending)
+      - [ ] Create filtered feed implementations (UI integration pending)
 
-## Next Steps (Client Focus)
-- Begin Phase 3: Social Interaction Features (Client-Side)
-  - Start with Comment System implementation
-    - Build Comment UI components (`bikr-client/components/content/Comment/`)
-    - Integrate Comment UI with API endpoints (Create, Read, Update, Delete, Like)
-  - Develop Follow/Connection system (Client-Side)
-    - Implement UI for user discovery (search, recommendations)
-    - Implement UI for following/followers lists
+ ## Next Steps (Client Focus)
+ - Continue Phase 3: Social Interaction Features (Client-Side)
+   - Develop Follow/Connection system (Client-Side) [NEXT FOCUS]
+     - Implement UI for user discovery (search, recommendations)
+     - Implement UI for following/followers lists
     - Integrate follow/unfollow actions with API
   - Implement Content Sharing features (Client-Side)
     - Build share UI components/interactions
