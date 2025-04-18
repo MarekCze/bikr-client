@@ -1,81 +1,73 @@
 import React, { useState } from 'react';
-import { StyleSheet } from 'react-native';
-import { Button, Input, YStack } from 'tamagui';
-import { apiClient } from '../../../services/api';
+import { Alert } from 'react-native';
+import { Input, Button, XStack, Spinner } from 'tamagui';
+import { SupabaseContentRepository } from '@/repositories/SupabaseContentRepository';
+import { useAuth } from '@/hooks/useAuth';
+import { CreateCommentInput } from 'bikr-shared/types/post'; // Use path alias
+
+// Instantiate repository (replace with DI or context later)
+const contentRepository = new SupabaseContentRepository();
 
 interface CommentInputProps {
   postId: string;
-  parentId?: string;
-  onCommentAdded?: (comment: any) => void;
+  onCommentAdded?: () => void; // Optional callback after successful post
 }
 
-export const CommentInput = ({ postId, parentId, onCommentAdded }: CommentInputProps) => {
-  const [comment, setComment] = useState('');
+export default function CommentInput({ postId, onCommentAdded }: CommentInputProps) {
+  const [commentText, setCommentText] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { session } = useAuth(); // Get the full session which includes the token
 
   const handleSubmit = async () => {
-    if (!comment.trim()) return;
-    
+    if (!commentText.trim()) {
+      Alert.alert('Error', 'Comment cannot be empty.');
+      return;
+    }
+
+    if (!session?.session?.access_token) {
+      Alert.alert('Error', 'You must be logged in to comment.');
+      return;
+    }
+
     setIsSubmitting(true);
     try {
-      const token = ''; // TODO: Get token from auth context
-      const newComment = await apiClient.content.createComment(postId, {
-        content: comment,
-        parentId,
-      }, token);
+      const input: CreateCommentInput = {
+        content: commentText,
+        // parent_comment_id can be added later for replies
+      };
       
-      if (onCommentAdded) {
-        onCommentAdded(newComment);
-      }
-      
-      setComment('');
-    } catch (error) {
+      // Pass postId, input, and the access token
+      await contentRepository.createComment(postId, input, session.session.access_token);
+
+      setCommentText(''); // Clear input on success
+      Alert.alert('Success', 'Comment posted!');
+      onCommentAdded?.(); // Call the callback if provided
+
+    } catch (error: any) {
       console.error('Failed to post comment:', error);
-      // TODO: Show error toast
+      Alert.alert('Error', error.message || 'Failed to post comment.');
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <YStack space="$2" padding="$2">
+    <XStack space="$2" alignItems="center" padding="$2">
       <Input
+        flex={1}
         placeholder="Add a comment..."
-        value={comment}
-        onChangeText={setComment}
-        multiline
+        value={commentText}
+        onChangeText={setCommentText}
+        disabled={isSubmitting}
       />
       <Button 
+        theme="active" 
         onPress={handleSubmit} 
-        disabled={!comment.trim() || isSubmitting}
-        themeInverse
+        disabled={isSubmitting || !commentText.trim()}
+        icon={isSubmitting ? <Spinner size="small" /> : undefined}
       >
-        {isSubmitting ? 'Posting...' : 'Post Comment'}
+        {isSubmitting ? '' : 'Post'}
       </Button>
-    </YStack>
+    </XStack>
   );
-};
-
-const styles = StyleSheet.create({
-  container: {
-    padding: 8,
-  },
-  input: {
-    borderWidth: 1,
-    borderRadius: 5,
-    padding: 8,
-    marginBottom: 8,
-  },
-  button: {
-    padding: 8,
-    borderRadius: 5,
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: 'white',
-    fontWeight: 'bold',
-  },
-  disabledButton: {
-    opacity: 0.5,
-  },
-});
+}

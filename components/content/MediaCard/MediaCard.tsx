@@ -1,6 +1,9 @@
-import React from 'react';
-import { Stack, YStack } from 'tamagui';
+import React, { useState, useCallback } from 'react'; // Add useState, useCallback
+import { Stack, YStack, Spinner, Paragraph } from 'tamagui'; // Add Spinner, Paragraph
 import { MediaCardProps } from './MediaCardTypes';
+import { Comment } from 'bikr-shared/types/post'; // Import Comment type
+import { SupabaseContentRepository } from '@/repositories/SupabaseContentRepository'; // Import repository
+import { useAuth } from '@/hooks/useAuth'; // Import auth hook
 import TextPostCard from './TextPostCard';
 import ImageGalleryCard from './ImageGalleryCard';
 import VideoPlayerCard from './VideoPlayerCard';
@@ -8,6 +11,7 @@ import PollCard from './PollCard';
 import ContextBadge from './ContextBadge';
 import { OwnerRibbon } from '../OwnerRibbon';
 import { EngagementRibbon } from '../EngagementRibbon';
+import { CommentList, CommentInput } from '../Comment'; // Import comment components
 
 export default function MediaCard({
   post,
@@ -17,6 +21,48 @@ export default function MediaCard({
   showOwnerRibbon = true,
   testID,
 }: MediaCardProps) {
+  const [showComments, setShowComments] = useState(false);
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [isLoadingComments, setIsLoadingComments] = useState(false);
+  const [commentError, setCommentError] = useState<string | null>(null);
+  const { session } = useAuth(); // Get auth session for token
+
+  // Instantiate repository (consider moving to context/DI later)
+  const contentRepository = new SupabaseContentRepository();
+
+  // Function to fetch comments
+  const fetchComments = useCallback(async () => {
+    if (!post.id) return; // Need post ID
+
+    setIsLoadingComments(true);
+    setCommentError(null);
+    try {
+      // Pass token if available (optional for GET comments based on server route)
+      const fetchedComments = await contentRepository.getCommentsByPostId(
+        post.id, 
+        undefined, // limit
+        undefined, // offset 
+        session?.session?.access_token // Pass token
+      );
+      setComments(fetchedComments || []); // Ensure it's an array
+    } catch (err: any) {
+      console.error("Error fetching comments:", err);
+      setCommentError(err.message || 'Failed to load comments.');
+    } finally {
+      setIsLoadingComments(false);
+    }
+  }, [post.id, session?.session?.access_token]); // Dependencies
+
+  // Handler for pressing the comment button
+  const handleCommentPress = () => {
+    const newState = !showComments;
+    setShowComments(newState);
+    // Fetch comments only when opening and if they haven't been fetched yet
+    if (newState && comments.length === 0) {
+      fetchComments();
+    }
+  };
+
   // Helper function to determine the content based on post type
   const renderContent = () => {
     // Check if post has poll options
@@ -52,7 +98,7 @@ export default function MediaCard({
       marginVertical="$2"
       borderRadius="$4"
       backgroundColor="$backgroundStrong"
-      pressable={!!onPress}
+      // Remove the 'pressable' prop; onPress should handle it
       onPress={onPress}
       onLongPress={onLongPress}
     >
@@ -84,13 +130,30 @@ export default function MediaCard({
         {showEngagementRibbon && (
           <EngagementRibbon
             postId={post.id}
-            likeCount={post.like_count}
-            commentCount={post.comment_count}
-            bookmarkCount={post.bookmark_count}
-            isLiked={post.user_interaction?.is_liked || false}
-            isBookmarked={post.user_interaction?.is_bookmarked || false}
-            isEvent={post.context_type === 'Event'}
+            // Use camelCase props based on likely type definition
+            likeCount={post.likeCount} 
+            commentCount={post.commentCount} 
+            bookmarkCount={post.bookmarkCount} 
+            isLiked={post.userInteraction?.isLiked || false} 
+            isBookmarked={post.userInteraction?.isBookmarked || false} 
+            isEvent={post.contextType === 'Event'}
+            // Pass the handler
+            onCommentPress={handleCommentPress} 
           />
+        )}
+
+        {/* Conditionally render comments section */}
+        {showComments && (
+          <YStack marginTop="$3" space="$2">
+            {isLoadingComments && <Spinner />}
+            {commentError && <Paragraph color="$red10">{commentError}</Paragraph>}
+            {!isLoadingComments && !commentError && (
+              <>
+                <CommentInput postId={post.id} onCommentAdded={fetchComments} />
+                <CommentList comments={comments} />
+              </>
+            )}
+          </YStack>
         )}
       </YStack>
     </Stack>
