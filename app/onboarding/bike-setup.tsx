@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router';
 import { ThemedView } from '@/components/ThemedView';
 import { ThemedText } from '@/components/ThemedText';
 import { SupabaseProfileRepository } from '@/repositories/SupabaseProfileRepository';
-import { Bike, BikeStatus, BikeType } from 'bikr-shared'; // Import types/enums
+import { Bike, BikeStatus, BikeType } from '../../../bikr-shared'; // Import types/enums
 import { useAuth } from '@/hooks/useAuth'; // Needed for owner_id
 
 // TODO: Replace TextInput with Tamagui Input/Select if available

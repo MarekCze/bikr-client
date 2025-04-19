@@ -5,7 +5,7 @@ import { YStack, XStack, Button, Spinner, Paragraph, H2, Input, Label, Select, A
 import { Check, ChevronDown } from '@tamagui/lucide-icons'; // Icons for Select
 import { ThemedView } from '@/components/ThemedView'; // Keep ThemedView for background
 import { SupabaseProfileRepository } from '@/repositories/SupabaseProfileRepository';
-import { Bike, BikeStatus, BikeType } from 'bikr-shared'; // Import types/enums
+import { Bike, BikeStatus, BikeType } from '@bikr/shared'; // Use package name for import
 import { useAuth } from '@/hooks/useAuth'; // Needed for owner_id implicitly
 
 // TODO: Add validation (basic added)

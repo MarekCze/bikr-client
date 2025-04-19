@@ -90,7 +90,20 @@
      - [x] Create UserFeed implementation
      - [x] Create PopularFeed implementation
      - [x] Create LocalFeed implementation
-      - [ ] Create filtered feed implementations (UI integration pending)
+     - [ ] Create filtered feed implementations (UI integration pending)
+
+7. Phase 4: Club Management (Client-Side) (0% - Blocked by Server API Completion)
+   - [x] Shared Definitions (`@bikr/shared`) updated (Types, Schemas including pagination/errors, Interface) - *Needs publishing*
+   - [~] Server API implementation in progress:
+     - [x] Repository methods implemented.
+     - [x] Service methods implemented (pending delegation for feed/posts).
+     - [x] All API routes implemented (`bikr-server/src/routes/club.ts`).
+     - [x] Routes registered (`bikr-server/src/routes/index.ts`).
+     - [ ] **Pending Server Tasks:** Service delegation logic, Authentication implementation, Testing, Swagger Docs, Schema placeholders (`z.any()`) resolution.
+   - [ ] Client Repository (`SupabaseClubRepository`) implementation needed (Blocked)
+   - [ ] UI Components (`components/club/`) needed (Blocked)
+   - [ ] Screens (`app/club/`) needed
+   - [ ] Integration into navigation and user profiles needed
 
  ## Next Steps (Client Focus)
  - Refine Phase 3.2: Following & Connections
@@ -98,7 +111,8 @@
  - Implement Phase 3.3: Content Sharing features (Client-Side) [NEXT FOCUS]
     - Build share UI components/interactions
     - Integrate with native sharing APIs
-- Complete remaining Content Domain API integrations (Comments, Bookmarks)
+- Complete remaining Content Domain API integrations (Bookmarks)
+- Begin Phase 4 Client Implementation (Repositories, Components, Screens) once Server API is complete and `@bikr/shared` is published/updated.
 
 ## Known Issues (Client Impact)
 ```mermaid
