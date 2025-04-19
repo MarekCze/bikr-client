@@ -89,13 +89,13 @@ In Progress
 
 ## 5. Route & Location Feature
 - **Tasks**:
-  - [ ] Create `RouteMap.tsx` component for displaying interactive maps.
-  - [ ] Integrate map provider (Google Maps, Mapbox, or other).
-  - [ ] Create `RoutePlanner.tsx` component for creating/editing routes.
-  - [ ] Create `LocationPicker.tsx` component for selecting meeting points.
-  - [ ] Implement location search and geocoding integration.
-  - [ ] Create `SavedRoutesList.tsx` for displaying user's saved routes.
-  - [ ] Create screens for route management (`app/routes/`).
+  - [x] Create `BaseMap.tsx` component for displaying interactive maps.
+  - [x] Integrate map provider (Google Maps, Mapbox, or other).
+  - [x] Create `RoutePlanner.tsx` component for creating/editing routes.
+  - [x] Create `LocationPicker.tsx` component for selecting meeting points.
+  - [x] Implement location search and geocoding integration.
+  - [x] Implement route listing & details through screens in `app/routes/`.
+  - [x] Create screens for route creation and editing in `app/routes/create.tsx` and `app/routes/[routeId]/edit/`.
 
 ## 6. Integration
 - **Tasks**:

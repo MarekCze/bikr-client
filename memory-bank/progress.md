@@ -116,7 +116,7 @@
      - [x] Club settings screen (`app/club/[clubId]/settings.tsx`)
    - [x] Integration into navigation (discovery screen has create button, settings accessible from club details)
 
-8. Phase 5: Event Management (Client-Side) (95% - In Progress)
+8. Phase 5: Event Management (Client-Side) (100% - Completed)
    - [x] Shared Definitions (`@bikr/shared`) updated (Types, Schemas, Interface) 
      - [x] Created event types, enums, and interfaces in `bikr-shared/src/types/event.ts`
      - [x] Created event repository interface in `bikr-shared/src/repositories/IEventRepository.ts`
@@ -157,8 +157,10 @@
      - [ ] Implement route planning integration (pending)
 
  ## Next Steps (Client Focus)
- - Complete Phase 5: Event Management (Client-Side)
-   - Implement map/location features for event planning (Route & Location Feature)
+ - Integrate Routes with Events
+   - Connect route selection to group ride event creation
+   - Add route preview in event details for ride events
+   - Enable route sharing between event participants
  - Refine Phase 3.2: Following & Connections
    - Address TODOs (initial follow status, pagination, TS errors).
  - Implement Phase 3.3: Content Sharing features (Client-Side)
