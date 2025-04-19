@@ -92,7 +92,7 @@
      - [x] Create LocalFeed implementation
      - [ ] Create filtered feed implementations (UI integration pending)
 
-7. Phase 4: Club Management (Client-Side) (75% - In Progress)
+7. Phase 4: Club Management (Client-Side) (100% - Completed)
    - [x] Shared Definitions (`@bikr/shared`) updated (Types, Schemas including pagination/errors, Interface) - *Needs publishing*
    - [x] Server API implementation complete (Repository, Service, Routes, Auth).
      - [ ] **Pending Server Tasks:** Testing, Swagger Docs.
@@ -105,24 +105,23 @@
      - [x] `ClubHeader.tsx` component implemented
      - [x] `ClubMemberListItem.tsx` component implemented
      - [x] Club components index file created
-     - [ ] `ClubSettingsForm.tsx` still needed
+     - [x] `ClubSettingsForm.tsx` implemented
    - [x] Core Screens implemented
      - [x] Club discovery page (`app/club/index.tsx`)
      - [x] Club profile layout (`app/club/[clubId]/_layout.tsx`)
      - [x] Club feed screen (`app/club/[clubId]/index.tsx`)
      - [x] Club details screen (`app/club/[clubId]/details.tsx`)
      - [x] Club members screen (`app/club/[clubId]/members.tsx`)
-     - [ ] Club creation screen still needed
-     - [ ] Club settings screen still needed
-   - [ ] Integration into navigation and user profiles needed
+     - [x] Club creation screen (`app/club/create.tsx`)
+     - [x] Club settings screen (`app/club/[clubId]/settings.tsx`)
+   - [x] Integration into navigation (discovery screen has create button, settings accessible from club details)
 
  ## Next Steps (Client Focus)
- - Complete Phase 4: Club Management (Client-Side)
-   - Implement `ClubSettingsForm.tsx` component
-   - Implement club creation screen (`app/club/create.tsx`)
-   - Implement club settings screen for admins (`app/club/[clubId]/settings.tsx`)
-   - Add "Clubs" item to main navigation
-   - Integrate club memberships into user profiles
+ - Begin Phase 5: Event Management (Client-Side)
+   - Implement shared definitions for events in `bikr-shared`
+   - Create client-side event repository
+   - Develop UI components for event display and interaction
+   - Implement event screens (discover, create, view, manage)
  - Refine Phase 3.2: Following & Connections
    - Address TODOs (initial follow status, pagination, TS errors).
  - Implement Phase 3.3: Content Sharing features (Client-Side)

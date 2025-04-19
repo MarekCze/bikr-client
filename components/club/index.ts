@@ -12,5 +12,5 @@ export { JoinLeaveButton } from './JoinLeaveButton';
 // Export club components as they're created
 export { ClubHeader } from './ClubHeader';
 export { ClubMemberListItem } from './ClubMemberListItem';
+export { ClubSettingsForm } from './ClubSettingsForm';
 // export { ClubDetails } from './ClubDetails';
-// export { ClubSettingsForm } from './ClubSettingsForm';
