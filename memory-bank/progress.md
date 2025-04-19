@@ -116,12 +116,35 @@
      - [x] Club settings screen (`app/club/[clubId]/settings.tsx`)
    - [x] Integration into navigation (discovery screen has create button, settings accessible from club details)
 
+8. Phase 5: Event Management (Client-Side) (60% - In Progress)
+   - [x] Shared Definitions (`@bikr/shared`) updated (Types, Schemas, Interface) 
+     - [x] Created event types, enums, and interfaces in `bikr-shared/src/types/event.ts`
+     - [x] Created event repository interface in `bikr-shared/src/repositories/IEventRepository.ts`
+     - [x] Created validation schemas in `bikr-shared/src/validation/eventSchemas.ts`
+   - [x] Client Repository implementation
+     - [x] Created `SupabaseEventRepository.ts` implementation
+     - [x] Implemented basic CRUD methods
+     - [x] Added `EventContext.tsx` provider for data access
+   - [x] UI Components partially developed
+     - [x] Created `EventListItem.tsx` component for displaying events in lists
+     - [x] Implemented `EventList.tsx` for showing event collections
+     - [x] Created component exports in `index.ts`
+   - [x] Core Screens implemented
+     - [x] Created event discovery page (`app/event/index.tsx`)
+     - [x] Created event creation form (`app/event/create.tsx`)
+     - [x] Implemented event details screen (`app/event/[eventId]/index.tsx`)
+     - [x] Set up navigation with `app/event/_layout.tsx`
+   - [ ] Additional Screens & Features (pending)
+     - [ ] Event edit functionality 
+     - [ ] Event participants listing screen
+     - [ ] Event scheduling features
+     - [ ] Route planning integration
+
  ## Next Steps (Client Focus)
- - Begin Phase 5: Event Management (Client-Side)
-   - Implement shared definitions for events in `bikr-shared`
-   - Create client-side event repository
-   - Develop UI components for event display and interaction
-   - Implement event screens (discover, create, view, manage)
+ - Complete Phase 5: Event Management (Client-Side)
+   - Implement remaining event screens (participants, schedule)
+   - Add event editing functionality
+   - Implement map/location features for event planning
  - Refine Phase 3.2: Following & Connections
    - Address TODOs (initial follow status, pagination, TS errors).
  - Implement Phase 3.3: Content Sharing features (Client-Side)
