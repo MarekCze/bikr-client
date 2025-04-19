@@ -12,13 +12,13 @@ This feature implements Phase 5 from the development plan, including sections 5.
 In Progress
 
 ## Cross-Project Dependencies
-- bikr-shared/src/types/event.ts (to be created)
-- bikr-shared/src/repositories/IEventRepository.ts (to be created)
-- bikr-shared/src/validation/eventSchemas.ts (to be created)
-- bikr-server/memory-bank/features/phase5-event-management.md (to be created)
-- bikr-server/src/routes/event.ts (to be created)
-- bikr-server/src/services/eventService.ts (to be created)
-- bikr-server/src/repositories/supabaseEventRepository.ts (to be created)
+- bikr-shared/src/types/event.ts (completed)
+- bikr-shared/src/repositories/IEventRepository.ts (completed)
+- bikr-shared/src/validation/eventSchemas.ts (completed)
+- bikr-server/memory-bank/features/phase5-event-management.md (completed)
+- bikr-server/src/routes/event.ts (completed)
+- bikr-server/src/services/eventService.ts (completed)
+- bikr-server/src/repositories/supabaseEventRepository.ts (completed)
 
 ## 1. Shared Definitions Integration
 - **Tasks**:
@@ -49,12 +49,12 @@ In Progress
 ## 3. UI Components (`bikr-client/components/event/`)
 - **Tasks**:
   - [x] Create `EventListItem.tsx`: Displays basic event info (name, date, image, participant count) for lists.
-  - [ ] Create `EventHeader.tsx`: Displays event banner, name, join/leave button, participant count, etc.
-  - [ ] Create `EventDetailsSection.tsx`: Displays event description, rules, location map, schedule.
+  - [x] Create `EventHeader.tsx`: Displays event banner, name, join/leave button, participant count, etc.
+  - [x] Create `EventDetailsSection.tsx`: Displays event description, rules, location map, schedule.
   - [ ] Create `EventParticipantListItem.tsx`: Displays participant avatar, name, status, action buttons (for organizers).
   - [x] Create `EventList.tsx`: Component for displaying a list of events with loading states.
   - [ ] Create `EventSettingsForm.tsx`: Form using Tamagui components for creating/editing event details.
-  - [ ] Create `ParticipateButton.tsx`: Button that shows "Join", "Leave", "Going", etc. based on user's participation status.
+  - [x] Create `ParticipateButton.tsx`: Button that shows "Join", "Leave", "Going", etc. based on user's participation status.
   - [ ] Create `EventScheduleItem.tsx`: Component for displaying schedule items in an event.
   - [x] Create `index.ts` export file for event components.
 
@@ -82,10 +82,10 @@ In Progress
   - [ ] Create `[eventId]/schedule.tsx`: Screen showing event schedule breakdown.
     - [ ] Display schedule items using `EventScheduleItem`.
     - [ ] Add schedule management UI for organizers.
-  - [ ] Create `[eventId]/settings.tsx`: Screen for event organizers to edit settings.
-    - [ ] Use `EventSettingsForm`, pre-filled with existing data.
-    - [ ] Handle form submission using `SupabaseEventRepository.updateEvent`.
-    - [ ] Add delete event functionality (with confirmation).
+  - [x] Create `[eventId]/settings.tsx`: Screen for event organizers to edit settings.
+    - [x] Use form components to edit event data.
+    - [x] Handle form submission using `SupabaseEventRepository.updateEvent`.
+    - [x] Add delete event functionality (with confirmation).
 
 ## 5. Route & Location Feature
 - **Tasks**:

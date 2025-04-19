@@ -116,29 +116,42 @@
      - [x] Club settings screen (`app/club/[clubId]/settings.tsx`)
    - [x] Integration into navigation (discovery screen has create button, settings accessible from club details)
 
-8. Phase 5: Event Management (Client-Side) (60% - In Progress)
+8. Phase 5: Event Management (Client-Side) (75% - In Progress)
    - [x] Shared Definitions (`@bikr/shared`) updated (Types, Schemas, Interface) 
      - [x] Created event types, enums, and interfaces in `bikr-shared/src/types/event.ts`
      - [x] Created event repository interface in `bikr-shared/src/repositories/IEventRepository.ts`
      - [x] Created validation schemas in `bikr-shared/src/validation/eventSchemas.ts`
+   - [x] Server-Side Implementation (Completed)
+     - [x] Server repository implementation (`supabaseEventRepository.ts`)
+     - [x] Service layer with business logic (`eventService.ts`)
+     - [x] All API routes implemented in `routes/event.ts`
+     - [x] Routes registered in main routes file
    - [x] Client Repository implementation
      - [x] Created `SupabaseEventRepository.ts` implementation
      - [x] Implemented basic CRUD methods
      - [x] Added `EventContext.tsx` provider for data access
-   - [x] UI Components partially developed
+   - [x] UI Components developed
      - [x] Created `EventListItem.tsx` component for displaying events in lists
      - [x] Implemented `EventList.tsx` for showing event collections
+     - [x] Created `EventHeader.tsx` for displaying event banner, title, and metadata
+     - [x] Implemented `EventDetailsSection.tsx` for showing comprehensive event information
+     - [x] Created `ParticipateButton.tsx` for event participation management (join/leave/status)
      - [x] Created component exports in `index.ts`
    - [x] Core Screens implemented
      - [x] Created event discovery page (`app/event/index.tsx`)
      - [x] Created event creation form (`app/event/create.tsx`)
      - [x] Implemented event details screen (`app/event/[eventId]/index.tsx`)
+       - [x] Integrated EventHeader, EventDetailsSection, and ParticipateButton
+       - [x] Added loading states and error handling
+     - [x] Created event settings screen (`app/event/[eventId]/settings.tsx`)
+       - [x] Implemented event editing form with validation
+       - [x] Added delete event functionality with confirmation
      - [x] Set up navigation with `app/event/_layout.tsx`
    - [ ] Additional Screens & Features (pending)
-     - [ ] Event edit functionality 
-     - [ ] Event participants listing screen
-     - [ ] Event scheduling features
-     - [ ] Route planning integration
+     - [ ] Create event participants listing screen
+     - [ ] Create event schedule management screen
+     - [ ] Implement event participant list component
+     - [ ] Implement route planning integration
 
  ## Next Steps (Client Focus)
  - Complete Phase 5: Event Management (Client-Side)
