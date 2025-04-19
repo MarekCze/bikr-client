@@ -116,7 +116,7 @@
      - [x] Club settings screen (`app/club/[clubId]/settings.tsx`)
    - [x] Integration into navigation (discovery screen has create button, settings accessible from club details)
 
-8. Phase 5: Event Management (Client-Side) (75% - In Progress)
+8. Phase 5: Event Management (Client-Side) (95% - In Progress)
    - [x] Shared Definitions (`@bikr/shared`) updated (Types, Schemas, Interface) 
      - [x] Created event types, enums, and interfaces in `bikr-shared/src/types/event.ts`
      - [x] Created event repository interface in `bikr-shared/src/repositories/IEventRepository.ts`
@@ -147,17 +147,18 @@
        - [x] Implemented event editing form with validation
        - [x] Added delete event functionality with confirmation
      - [x] Set up navigation with `app/event/_layout.tsx`
-   - [ ] Additional Screens & Features (pending)
-     - [ ] Create event participants listing screen
-     - [ ] Create event schedule management screen
-     - [ ] Implement event participant list component
-     - [ ] Implement route planning integration
+   - [x] Additional Screens & Features
+     - [x] Created event participants listing screen (`app/event/[eventId]/participants.tsx`)
+     - [x] Created event schedule management screen (`app/event/[eventId]/schedule.tsx`)
+     - [x] Implemented `EventParticipantListItem.tsx` component for displaying participants
+     - [x] Implemented `EventScheduleItem.tsx` component for displaying schedule items
+     - [x] Created tabbed layout for event details using `app/event/[eventId]/_layout.tsx`
+     - [x] Created `EventSettingsForm.tsx` for editing event details
+     - [ ] Implement route planning integration (pending)
 
  ## Next Steps (Client Focus)
  - Complete Phase 5: Event Management (Client-Side)
-   - Implement remaining event screens (participants, schedule)
-   - Add event editing functionality
-   - Implement map/location features for event planning
+   - Implement map/location features for event planning (Route & Location Feature)
  - Refine Phase 3.2: Following & Connections
    - Address TODOs (initial follow status, pagination, TS errors).
  - Implement Phase 3.3: Content Sharing features (Client-Side)

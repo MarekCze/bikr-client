@@ -51,11 +51,11 @@ In Progress
   - [x] Create `EventListItem.tsx`: Displays basic event info (name, date, image, participant count) for lists.
   - [x] Create `EventHeader.tsx`: Displays event banner, name, join/leave button, participant count, etc.
   - [x] Create `EventDetailsSection.tsx`: Displays event description, rules, location map, schedule.
-  - [ ] Create `EventParticipantListItem.tsx`: Displays participant avatar, name, status, action buttons (for organizers).
+  - [x] Create `EventParticipantListItem.tsx`: Displays participant avatar, name, status, action buttons (for organizers).
   - [x] Create `EventList.tsx`: Component for displaying a list of events with loading states.
-  - [ ] Create `EventSettingsForm.tsx`: Form using Tamagui components for creating/editing event details.
+  - [x] Create `EventSettingsForm.tsx`: Form using Tamagui components for creating/editing event details.
   - [x] Create `ParticipateButton.tsx`: Button that shows "Join", "Leave", "Going", etc. based on user's participation status.
-  - [ ] Create `EventScheduleItem.tsx`: Component for displaying schedule items in an event.
+  - [x] Create `EventScheduleItem.tsx`: Component for displaying schedule items in an event.
   - [x] Create `index.ts` export file for event components.
 
 ## 4. Screens (`bikr-client/app/event/`)
@@ -70,18 +70,18 @@ In Progress
     - [x] Handle form submission using `SupabaseEventRepository.createEvent`.
     - [x] Navigate to the new event's page on success.
   - [x] Create `[eventId]/` directory.
-  - [ ] Create `[eventId]/_layout.tsx`: Layout for tabs within an event profile (e.g., Details, Participants, Schedule).
+  - [x] Create `[eventId]/_layout.tsx`: Layout for tabs within an event profile (e.g., Details, Participants, Schedule).
   - [x] Create `[eventId]/index.tsx`: Main event details screen.
     - [x] Display event banner/cover.
     - [x] Display event description, date/time, location.
     - [x] Show participant count and organizer info.
     - [x] Implement join/leave functionality.
-  - [ ] Create `[eventId]/participants.tsx`: Screen showing event participant directory.
-    - [ ] Display participants using `EventParticipantListItem`.
-    - [ ] Implement status update UI for organizers.
-  - [ ] Create `[eventId]/schedule.tsx`: Screen showing event schedule breakdown.
-    - [ ] Display schedule items using `EventScheduleItem`.
-    - [ ] Add schedule management UI for organizers.
+  - [x] Create `[eventId]/participants.tsx`: Screen showing event participant directory.
+    - [x] Display participants using `EventParticipantListItem`.
+    - [x] Implement status update UI for organizers.
+  - [x] Create `[eventId]/schedule.tsx`: Screen showing event schedule breakdown.
+    - [x] Display schedule items using `EventScheduleItem`.
+    - [x] Add schedule management UI for organizers.
   - [x] Create `[eventId]/settings.tsx`: Screen for event organizers to edit settings.
     - [x] Use form components to edit event data.
     - [x] Handle form submission using `SupabaseEventRepository.updateEvent`.
