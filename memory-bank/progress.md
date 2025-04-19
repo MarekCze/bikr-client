@@ -92,23 +92,43 @@
      - [x] Create LocalFeed implementation
      - [ ] Create filtered feed implementations (UI integration pending)
 
-7. Phase 4: Club Management (Client-Side) (0% - Ready to Start)
+7. Phase 4: Club Management (Client-Side) (75% - In Progress)
    - [x] Shared Definitions (`@bikr/shared`) updated (Types, Schemas including pagination/errors, Interface) - *Needs publishing*
    - [x] Server API implementation complete (Repository, Service, Routes, Auth).
      - [ ] **Pending Server Tasks:** Testing, Swagger Docs.
-   - [ ] Client Repository (`SupabaseClubRepository`) implementation needed
-   - [ ] UI Components (`components/club/`) needed
-   - [ ] Screens (`app/club/`) needed
+   - [x] Client Repository (`SupabaseClubRepository`) implementation completed
+     - [x] All API methods implemented and tested
+     - [x] Context provider for club data access added
+   - [x] UI Components developed
+     - [x] `ClubListItem.tsx` component implemented
+     - [x] `JoinLeaveButton.tsx` component implemented
+     - [x] `ClubHeader.tsx` component implemented
+     - [x] `ClubMemberListItem.tsx` component implemented
+     - [x] Club components index file created
+     - [ ] `ClubSettingsForm.tsx` still needed
+   - [x] Core Screens implemented
+     - [x] Club discovery page (`app/club/index.tsx`)
+     - [x] Club profile layout (`app/club/[clubId]/_layout.tsx`)
+     - [x] Club feed screen (`app/club/[clubId]/index.tsx`)
+     - [x] Club details screen (`app/club/[clubId]/details.tsx`)
+     - [x] Club members screen (`app/club/[clubId]/members.tsx`)
+     - [ ] Club creation screen still needed
+     - [ ] Club settings screen still needed
    - [ ] Integration into navigation and user profiles needed
 
  ## Next Steps (Client Focus)
+ - Complete Phase 4: Club Management (Client-Side)
+   - Implement `ClubSettingsForm.tsx` component
+   - Implement club creation screen (`app/club/create.tsx`)
+   - Implement club settings screen for admins (`app/club/[clubId]/settings.tsx`)
+   - Add "Clubs" item to main navigation
+   - Integrate club memberships into user profiles
  - Refine Phase 3.2: Following & Connections
    - Address TODOs (initial follow status, pagination, TS errors).
- - Implement Phase 3.3: Content Sharing features (Client-Side) [NEXT FOCUS]
+ - Implement Phase 3.3: Content Sharing features (Client-Side)
     - Build share UI components/interactions
     - Integrate with native sharing APIs
  - Complete remaining Content Domain API integrations (Bookmarks)
- - Begin Phase 4 Client Implementation (Repositories, Components, Screens) once `@bikr/shared` is published/updated.
 
 ## Known Issues (Client Impact)
 ```mermaid

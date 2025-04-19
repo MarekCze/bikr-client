@@ -561,4 +561,50 @@ export const apiClient = {
   },
 };
 
+// Simple API wrapper for use with repository pattern
+export const api = {
+  get: async <T>(url: string, options?: { params?: URLSearchParams }): Promise<{ data: T }> => {
+    const queryString = options?.params ? `?${options.params.toString()}` : '';
+    const response = await fetch(`${API_BASE}${url}${queryString}`, {
+      method: 'GET',
+      headers: getHeaders(), // Token handling is done in getHeaders
+    });
+    
+    const data = await handleResponse(response);
+    return { data };
+  },
+  
+  post: async <T>(url: string, body?: any): Promise<{ data: T }> => {
+    const response = await fetch(`${API_BASE}${url}`, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: body ? JSON.stringify(body) : undefined,
+    });
+    
+    const data = await handleResponse(response);
+    return { data };
+  },
+  
+  put: async <T>(url: string, body?: any): Promise<{ data: T }> => {
+    const response = await fetch(`${API_BASE}${url}`, {
+      method: 'PUT',
+      headers: getHeaders(),
+      body: body ? JSON.stringify(body) : undefined,
+    });
+    
+    const data = await handleResponse(response);
+    return { data };
+  },
+  
+  delete: async <T>(url: string): Promise<{ data: T }> => {
+    const response = await fetch(`${API_BASE}${url}`, {
+      method: 'DELETE',
+      headers: getHeaders(),
+    });
+    
+    const data = await handleResponse(response);
+    return { data };
+  },
+};
+
 export default apiClient;

@@ -10,61 +10,61 @@
 
 ## 2. Client Repository (`bikr-client/repositories/`)
 - **Tasks**:
-  - [ ] Create `IClubRepository.ts` (if not defined in `bikr-shared`).
-  - [ ] Create `SupabaseClubRepository.ts`. (Ready to Start)
-  - [ ] Implement `IClubRepository` interface in `SupabaseClubRepository`. (Ready to Start)
-    - [ ] `createClub(clubData)`: Calls `POST /clubs`.
-    - [ ] `getClubs(filters)`: Calls `GET /clubs`.
-    - [ ] `getClubById(clubId)`: Calls `GET /clubs/:clubId`.
-    - [ ] `updateClub(clubId, updateData)`: Calls `PUT /clubs/:clubId`.
-    - [ ] `deleteClub(clubId)`: Calls `DELETE /clubs/:clubId`.
-    - [ ] `joinClub(clubId)`: Calls `POST /clubs/:clubId/join`.
-    - [ ] `leaveClub(clubId)`: Calls `POST /clubs/:clubId/leave`.
-    - [ ] `getClubMembers(clubId)`: Calls `GET /clubs/:clubId/members`.
-    - [ ] `updateClubMemberRole(clubId, userId, role)`: Calls `PUT /clubs/:clubId/members/:userId`.
-    - [ ] `removeClubMember(clubId, userId)`: Calls `DELETE /clubs/:clubId/members/:userId`.
-    - [ ] `getClubFeed(clubId, pagination)`: Calls `GET /clubs/:clubId/feed`.
-    - [ ] `createClubPost(clubId, postData)`: Calls `POST /clubs/:clubId/posts` (if applicable).
-  - [ ] Add `ClubRepository` to dependency injection or context providers. (Ready to Start)
+  - [x] Create `IClubRepository.ts` (defined in `bikr-shared`).
+  - [x] Create `SupabaseClubRepository.ts`.
+  - [x] Implement `IClubRepository` interface in `SupabaseClubRepository`.
+    - [x] `createClub(clubData)`: Calls `POST /clubs`.
+    - [x] `getClubs(filters)`: Calls `GET /clubs`.
+    - [x] `getClubById(clubId)`: Calls `GET /clubs/:clubId`.
+    - [x] `updateClub(clubId, updateData)`: Calls `PUT /clubs/:clubId`.
+    - [x] `deleteClub(clubId)`: Calls `DELETE /clubs/:clubId`.
+    - [x] `joinClub(clubId)`: Calls `POST /clubs/:clubId/join`.
+    - [x] `leaveClub(clubId)`: Calls `POST /clubs/:clubId/leave`.
+    - [x] `getClubMembers(clubId)`: Calls `GET /clubs/:clubId/members`.
+    - [x] `updateClubMemberRole(clubId, userId, role)`: Calls `PUT /clubs/:clubId/members/:userId`.
+    - [x] `removeClubMember(clubId, userId)`: Calls `DELETE /clubs/:clubId/members/:userId`.
+    - [x] `getClubFeed(clubId, pagination)`: Calls `GET /clubs/:clubId/feed`.
+    - [x] `createClubPost(clubId, postData)`: Calls `POST /clubs/:clubId/posts` (if applicable).
+  - [x] Add `ClubRepository` to dependency injection or context providers.
 
 ## 3. UI Components (`bikr-client/components/club/`)
-- **Tasks**: (Ready to Start)
-  - [ ] Create `ClubListItem.tsx`: Displays basic club info (name, image, member count) for lists.
-  - [ ] Create `ClubHeader.tsx`: Displays club banner, avatar, name, join/leave button, member count, etc. on the club profile.
-  - [ ] Create `ClubDetails.tsx`: Displays club description, rules, location map (basic for now).
-  - [ ] Create `ClubMemberListItem.tsx`: Displays member avatar, name, role, action buttons (promote/remove for admins).
+- **Tasks**:
+  - [x] Create `ClubListItem.tsx`: Displays basic club info (name, image, member count) for lists.
+  - [x] Create `ClubHeader.tsx`: Displays club banner, avatar, name, join/leave button, member count, etc. on the club profile.
+  - [x] Create `ClubDetails.tsx`: Displays club description, rules, location map (basic for now). (Implemented in details.tsx screen)
+  - [x] Create `ClubMemberListItem.tsx`: Displays member avatar, name, role, action buttons (promote/remove for admins).
   - [ ] Create `ClubSettingsForm.tsx`: Form using Tamagui components for creating/editing club details (name, description, privacy, rules, image upload).
-  - [ ] Create `JoinLeaveButton.tsx`: Button that shows "Join", "Leave", "Requested", or "Admin" based on user's membership status. Handles API calls via repository.
+  - [x] Create `JoinLeaveButton.tsx`: Button that shows "Join", "Leave", "Requested", or "Admin" based on user's membership status. Handles API calls via repository.
+  - [x] Create `index.ts` export file for club components.
 
 ## 4. Screens (`bikr-client/app/club/`)
-- **Tasks**: (Ready to Start)
-  - [ ] Create `_layout.tsx`: Stack layout for club-related screens.
-  - [ ] Create `index.tsx`: Club discovery screen.
-    - [ ] Implement search/filter UI.
-    - [ ] Fetch and display clubs using `ClubListItem` and `SupabaseClubRepository`.
-    - [ ] Add button/link to navigate to `create.tsx`.
+- **Tasks**:
+  - [x] Create `_layout.tsx`: Stack layout for club-related screens.
+  - [x] Create `index.tsx`: Club discovery screen.
+    - [x] Implement search/filter UI.
+    - [x] Fetch and display clubs using `ClubListItem` and `SupabaseClubRepository`.
+    - [x] Add button/link to navigate to `create.tsx`.
   - [ ] Create `create.tsx`: Screen for creating a new club.
     - [ ] Use `ClubSettingsForm`.
     - [ ] Handle form submission using `SupabaseClubRepository.createClub`.
     - [ ] Navigate to the new club's page on success.
-  - [ ] Create `[clubId]/` directory.
-  - [ ] Create `[clubId]/_layout.tsx`: Layout for tabs within a club profile (e.g., Feed, Details, Members).
-  - [ ] Create `[clubId]/index.tsx`: Main club profile screen (Feed).
-    - [ ] Use `ClubHeader`.
-    - [ ] Fetch club feed using `SupabaseClubRepository.getClubFeed`.
-    - [ ] Display feed using `BaseFeedPage` or similar component, passing club context.
-    - [ ] Adapt post creation UI to allow posting *to* this club.
-  - [ ] Create `[clubId]/details.tsx`: Screen showing club details.
-    - [ ] Use `ClubHeader`.
-    - [ ] Use `ClubDetails` component.
-    - [ ] Fetch club details using `SupabaseClubRepository.getClubById`.
-  - [ ] Create `[clubId]/members.tsx`: Screen showing club member directory.
-    - [ ] Use `ClubHeader`.
-    - [ ] Fetch members using `SupabaseClubRepository.getClubMembers`.
-    - [ ] Display members using `ClubMemberListItem`.
-    - [ ] Implement role update/removal UI for admins.
+  - [x] Create `[clubId]/` directory.
+  - [x] Create `[clubId]/_layout.tsx`: Layout for tabs within a club profile (e.g., Feed, Details, Members).
+  - [x] Create `[clubId]/index.tsx`: Main club profile screen (Feed).
+    - [x] Use `ClubHeader`.
+    - [x] Implement empty state for feed.
+    - [x] Display loading/error states.
+    - [ ] Properly integrate with feed system when club feed is available.
+  - [x] Create `[clubId]/details.tsx`: Screen showing club details.
+    - [x] Use club data from parent layout.
+    - [x] Display club info (creation date, member count, privacy).
+    - [x] Add admin actions section for club owners/admins.
+  - [x] Create `[clubId]/members.tsx`: Screen showing club member directory.
+    - [x] Use `ClubHeader` indirectly through parent layout.
+    - [x] Fetch members using `SupabaseClubRepository.getClubMembers`.
+    - [x] Display members using `ClubMemberListItem`.
+    - [x] Implement role update/removal UI for admins.
   - [ ] Create `[clubId]/settings.tsx`: Screen for club owners/admins to edit settings.
-    - [ ] Use `ClubHeader`.
     - [ ] Use `ClubSettingsForm`, pre-filled with existing data.
     - [ ] Handle form submission using `SupabaseClubRepository.updateClub`.
     - [ ] Add delete club functionality (with confirmation).
@@ -75,3 +75,5 @@
   - [ ] Ensure deep linking works for club profiles (`/club/:clubId`).
   - [ ] Link club names/badges in posts or user profiles to the respective club screen.
   - [ ] Update user profile screen to show club memberships.
+  - [ ] Add proper error handling for network/permission issues.
+  - [ ] Add loading states and optimistic UI updates.
