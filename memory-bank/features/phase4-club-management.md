@@ -11,8 +11,8 @@
 ## 2. Client Repository (`bikr-client/repositories/`)
 - **Tasks**:
   - [ ] Create `IClubRepository.ts` (if not defined in `bikr-shared`).
-  - [ ] Create `SupabaseClubRepository.ts`.
-  - [ ] Implement `IClubRepository` interface in `SupabaseClubRepository`.
+  - [ ] Create `SupabaseClubRepository.ts`. (Ready to Start)
+  - [ ] Implement `IClubRepository` interface in `SupabaseClubRepository`. (Ready to Start)
     - [ ] `createClub(clubData)`: Calls `POST /clubs`.
     - [ ] `getClubs(filters)`: Calls `GET /clubs`.
     - [ ] `getClubById(clubId)`: Calls `GET /clubs/:clubId`.
@@ -25,10 +25,10 @@
     - [ ] `removeClubMember(clubId, userId)`: Calls `DELETE /clubs/:clubId/members/:userId`.
     - [ ] `getClubFeed(clubId, pagination)`: Calls `GET /clubs/:clubId/feed`.
     - [ ] `createClubPost(clubId, postData)`: Calls `POST /clubs/:clubId/posts` (if applicable).
-  - [ ] Add `ClubRepository` to dependency injection or context providers.
+  - [ ] Add `ClubRepository` to dependency injection or context providers. (Ready to Start)
 
 ## 3. UI Components (`bikr-client/components/club/`)
-- **Tasks**:
+- **Tasks**: (Ready to Start)
   - [ ] Create `ClubListItem.tsx`: Displays basic club info (name, image, member count) for lists.
   - [ ] Create `ClubHeader.tsx`: Displays club banner, avatar, name, join/leave button, member count, etc. on the club profile.
   - [ ] Create `ClubDetails.tsx`: Displays club description, rules, location map (basic for now).
@@ -37,7 +37,7 @@
   - [ ] Create `JoinLeaveButton.tsx`: Button that shows "Join", "Leave", "Requested", or "Admin" based on user's membership status. Handles API calls via repository.
 
 ## 4. Screens (`bikr-client/app/club/`)
-- **Tasks**:
+- **Tasks**: (Ready to Start)
   - [ ] Create `_layout.tsx`: Stack layout for club-related screens.
   - [ ] Create `index.tsx`: Club discovery screen.
     - [ ] Implement search/filter UI.
